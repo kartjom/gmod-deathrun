@@ -8,14 +8,18 @@ function ent:StoreValue(key, value)
     self.KeyValues[string.lower(key)] = value
 end
 
-function ent:GetStoredValue(key, desiredType)
+function ent:GetStoredValue(key, desiredType, default)
     if (self.KeyValues == nil) then
         return nil
     end
 
-    if (desiredType != nil) then
-        return util.StringToType(self.KeyValues[string.lower(key)], "Vector")
+    local val = self.KeyValues[string.lower(key)]
+
+    if (val != nil && desiredType != nil) then
+        return util.StringToType(val, desiredType)
+    elseif (val == nil && default != nil) then
+        return default
     else
-        return self.KeyValues[string.lower(key)]
+        return val
     end
 end

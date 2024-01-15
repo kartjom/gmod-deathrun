@@ -73,7 +73,7 @@ function GM:CanPlayerSuicide(ply)
 end
 
 function GM:GetFallDamage(ply, speed)
-    return (speed / 7)
+    return (5 * ( speed / 300 ))
 end
 
 hook.Add("AllowPlayerPickup", "SpectatorDisablePickup", function(ply, ent)

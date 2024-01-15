@@ -1,5 +1,3 @@
-AddCSLuaFile()
-
 ENT.Base = "base_filter"
 ENT.Type = "filter"
 

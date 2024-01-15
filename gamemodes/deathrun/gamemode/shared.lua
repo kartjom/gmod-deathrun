@@ -15,3 +15,5 @@ MAPVER = {
     TF2 = 1,
     CSS = 2,
 }
+
+DeriveGamemode("base")

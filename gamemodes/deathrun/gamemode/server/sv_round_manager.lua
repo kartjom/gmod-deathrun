@@ -71,6 +71,10 @@ function RoundManager.PrepareStart()
         v:SetMoveType(MOVETYPE_NONE)
     end
 
+    for k,v in pairs(ents.FindByClass("team_round_timer")) do
+        v:FireOutputIfAvailable("OnSetupStart")
+    end
+
     timer.CreateManaged("PrepareCountdown", 1, 0, function()
         RoundManager.SetCurrentTime(RoundManager.CurrentTime - 1)
         if(RoundManager.CurrentTime <= 0) then
@@ -88,6 +92,10 @@ function RoundManager.RoundStart()
 
     for k,v in pairs(RoundManager.GetRunners()) do
         v:SetMoveType(MOVETYPE_WALK)
+    end
+
+    for k,v in pairs(ents.FindByClass("team_round_timer")) do
+        v:FireOutputIfAvailable("OnSetupFinished")
     end
 
     timer.CreateManaged("RoundCountdown", 1, 0, function ()
