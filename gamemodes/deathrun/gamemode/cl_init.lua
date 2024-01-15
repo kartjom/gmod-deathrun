@@ -1,6 +1,8 @@
 include("shared.lua")
 
 /* Include Client Files (see init.lua) */
+include("client/cl_round_manager.lua")
+include("client/cl_hud.lua")
 
 net.Receive("SyncTeamCreation", function()
     TEAM.RUNNER = net.ReadInt(16)

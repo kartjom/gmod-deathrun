@@ -2,42 +2,62 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 
+AddCSLuaFile("client/cl_round_manager.lua")
+AddCSLuaFile("client/cl_hud.lua")
+
 /* Include Server Files */
 include("shared.lua")
+include("server/sv_timers.lua")
+include("server/sv_round_manager.lua")
+include("server/sv_entry_point.lua")
 
 include("server/sv_utils.lua")
 include("server/sv_spawns.lua")
 
 include("server/sv_entity.lua")
 include("server/sv_player.lua")
-
-include("server/sv_round_manager.lua")
 include("server/sv_spectator.lua")
 
 util.AddNetworkString("SyncTeamCreation")
 
 function GM:PlayerInitialSpawn(ply)
-    net.Start("SyncTeamCreation")
-        net.WriteInt(TEAM.RUNNER, 16)
-        net.WriteInt(TEAM.ACTIVATOR, 16)
+    ply:SyncTeams()
+
+    net.Start('GameStateUpdate')
+        net.WriteInt(RoundManager.GameState, 8)
     net.Send(ply)
+
+    ply.InitialSpawn = true
 end
 
-function GM:InitPostEntity()
-    local mapver = self:GetMapVersion()
+function GM:PlayerSpawn(ply)
+    if (ply.Initialized == nil) then ply.Initialized = false end
 
-    if (mapver == MAPVER.CSS || mapver == MAPVER.OTHER) then
-        TEAM.RUNNER = 3
-        TEAM.ACTIVATOR = 2
+	if (!ply.Initialized) then
+		ply.Initialized = true
+
+		if (RoundManager.GameState == STATE.AWAIT) then
+			ply:SetRunner()
+		else
+			ply:SetSpectator()
+		end
+	end
+
+	ply.InitialSpawn = false
+end
+
+function GM:PlayerDeath(ply)
+    ply.NextRespawn = CurTime() + 3
+end
+
+function GM:PlayerDeathThink(ply)
+    if (CurTime() > ply.NextRespawn) then
+        ply.Initialized = false
+        ply:Spawn()
+        return
     end
 
-    if (mapver == MAPVER.TF2) then
-        TEAM.RUNNER = 2
-        TEAM.ACTIVATOR = 3
-    end
-
-    team.SetUp(TEAM.RUNNER, "Runners", Color(0, 100, 255))
-    team.SetUp(TEAM.ACTIVATOR, "Activator", Color(255, 0, 0))
+    return false
 end
 
 function GM:PlayerNoClip()
@@ -48,17 +68,8 @@ function GM:PlayerSpawnAsSpectator(ply)
     ply:SetSpectator()
 end
 
-function GM:PlayerDeath(ply)
-    ply.NextRespawn = CurTime() + 3
-end
-
-function GM:PlayerDeathThink(ply)
-    if (CurTime() > ply.NextRespawn) then
-        ply:SetSpectator()
-        return
-    end
-
-    return false
+function GM:CanPlayerSuicide(ply)
+    return ply:IsRunner() || ply:IsActivator()
 end
 
 function GM:GetFallDamage(ply, speed)

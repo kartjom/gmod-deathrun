@@ -1,11 +1,3 @@
-function GM:PlayerSpawn(ply)
-    ply:ResetData()
-
-    if (!ply:IsSpectator() && !ply:IsActivator() && !ply:IsRunner()) then
-        self:PlayerSpawnAsSpectator(ply)
-    end
-end
-
 function GM:LookupSpawns()
     local mapver = self:GetMapVersion()
     self.TeamSpawns = { [TEAM.RUNNER] = {}, [TEAM.ACTIVATOR] = {} }

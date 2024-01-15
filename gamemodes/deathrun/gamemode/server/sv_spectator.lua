@@ -12,19 +12,40 @@ hook.Add("KeyPress", "Spectating", function(ply, key)
 	end
 end)
 
+function ply:IsSpectator()
+    return self:Alive() && self:Team() == TEAM.SPECTATOR
+end
+
 function ply:SetSpectator()
-	self:StripWeapons()
-	self:RemoveAllAmmo()
-	
+	self:ResetData()
+    self.Initialized = true
+
 	self:SetTeam(TEAM.SPECTATOR)
+	self:Spawn()
 	self:Spectate(OBS_MODE_ROAMING)
 	self.SpecPly = 1
+
+	self:StripWeapons()
+	self:RemoveAllAmmo()
+	self:CrosshairDisable()
+	self:SetNoDraw(true)
+	self:SetNoCollideWithTeammates(true)
+	self:SetNoTarget(true)
+	self:AllowFlashlight(false)
+	self:GodEnable()
+end
+
+function ply:StopSpectating()
+    self:UnSpectate()
+    self:ResetData()
+
+    self:Spawn()
 end
 
 function ply:SpectateNext()
 	if (!self:IsSpectator()) then return end
 
-	local players = RoundManager.GetAlive()
+	local players = RoundManager.GetPlayers(false)
 	if (#players < 1) then return end
 	
 	if (self.SpecPly + 1 > #players) then self.SpecPly = 1 else self.SpecPly = self.SpecPly + 1 end
@@ -34,7 +55,7 @@ end
 function ply:SpectatePrevious()
 	if (!self:IsSpectator()) then return end
 
-	local players = RoundManager.GetAlive()
+	local players = RoundManager.GetPlayers(false)
 	if (#players < 1) then return end
 	
 	if (self.SpecPly - 1 < 1) then self.SpecPly = #players else self.SpecPly = self.SpecPly - 1 end
@@ -44,7 +65,7 @@ end
 function ply:ChangeSpecMode()
 	if (!self:IsSpectator()) then return end
 
-	local players = RoundManager.GetAlive()
+	local players = RoundManager.GetPlayers(false)
 	local mode = self:GetObserverMode()
 
 	if (#players < 1) then self:SetObserverMode(OBS_MODE_ROAMING) return end
@@ -58,14 +79,10 @@ function ply:ChangeSpecMode()
 				else self:SpectateNext() end
 			else self:SpectateNext() end
 		end
-
-		self:ChatPrint("First person mode")
-		self:SetObserverMode(OBS_MODE_IN_EYE)
+		self:SetObserverMode(OBS_MODE_IN_EYE) -- First person
 	elseif (mode == OBS_MODE_IN_EYE) then
-		self:ChatPrint("Third person mode")
-		self:SetObserverMode(OBS_MODE_CHASE)
+		self:SetObserverMode(OBS_MODE_CHASE) -- Third person
 	elseif (mode == OBS_MODE_CHASE) then
-		self:ChatPrint("Free roam mode")
-		self:SetObserverMode(OBS_MODE_ROAMING)
+		self:SetObserverMode(OBS_MODE_ROAMING) -- Free roam
 	end
 end

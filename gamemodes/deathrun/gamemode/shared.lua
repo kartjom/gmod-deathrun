@@ -1,10 +1,12 @@
 STATE = {
-    PREPARE = 0,
-    ACTION = 1,
-    END = 2
+	AWAIT = 0,
+	PREPARE = 1,
+	ACTION = 2,
+	END = 3
 }
 
 TEAM = {
+    UNASSIGNED = 1001,
     SPECTATOR = 1002,
 }
 
