@@ -49,6 +49,8 @@ function ENT:AcceptInput(inputName, activator, caller, data)
     if (string.lower(inputName) == "enable") then self.Enabled = true end
     if (string.lower(inputName) == "disable") then self.Enabled = false end
     if (string.lower(inputName) == "toggle") then self.Enabled = !self.Enabled end
+
+    PrintMessage(HUD_PRINTTALK, "[DEV] team_round_timer "..inputName..": "..tostring(data))
 end
 
 function ENT:Think()
@@ -92,4 +94,8 @@ function ENT:FireOutputIfAvailable(output)
     if (self:CanFireOutput(output)) then
         self:FireOutput(output)
     end
+end
+
+function ENT:UpdateTransmitState()	
+	return TRANSMIT_NEVER
 end

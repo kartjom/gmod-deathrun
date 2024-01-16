@@ -18,6 +18,7 @@ function ply:ResetData()
     self:RemoveAllAmmo()
 
     self:SetNoDraw(false)
+    self:SetColor(Color(255, 255, 255, 255))
     self:SetNoCollideWithTeammates(true)
     self:SetCustomCollisionCheck(false)
     self:SetNoTarget(false)

@@ -76,6 +76,10 @@ function GM:GetFallDamage(ply, speed)
     return (5 * ( speed / 300 ))
 end
 
+function GM:IsSpawnpointSuitable(ply, spawnpoint, makeSuitable)
+    return true
+end
+
 hook.Add("AllowPlayerPickup", "SpectatorDisablePickup", function(ply, ent)
     if (ply:IsSpectator()) then return false end
 end)
@@ -88,4 +92,15 @@ end)
 
 hook.Add("EntityTakeDamage", "ActivatorCrushDmgDisable", function(target, dmginfo)
     if (target:IsPlayer() && target:IsActivator() && dmginfo:GetDamageType() == DMG_CRUSH) then return true end
+end)
+hook.Add("PlayerShouldTakeDamage", "AntiTeamKill", function(ply, attacker)
+	if (attacker:IsPlayer() && ply:Team() == attacker:Team()) then
+		return false
+	end
+end)
+
+hook.Add("EntityKeyValue", "tf2_logic_auto_fix", function(ent, key, value)
+    if (ent:GetClass() == "logic_auto" && (key == "OnMultiNewMap" || key == "OnMultiNewRound")) then
+        ent:Fire("AddOutput", string.format("%s %s", "OnMapSpawn", value))
+    end
 end)

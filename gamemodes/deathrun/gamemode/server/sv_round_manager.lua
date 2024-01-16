@@ -98,6 +98,10 @@ function RoundManager.RoundStart()
         v:FireOutputIfAvailable("OnSetupFinished")
     end
 
+    for k,v in pairs(ents.FindByClass("tf_logic_arena")) do
+        v:TriggerOutput("OnArenaRoundStart")
+    end
+
     timer.CreateManaged("RoundCountdown", 1, 0, function ()
         RoundManager.SetCurrentTime(RoundManager.CurrentTime - 1)
 
@@ -113,7 +117,7 @@ end
 function RoundManager.RoundEnd(result)
     timer.RemoveManaged("RoundCountdown")
 
-    RoundManager.SetCurrentTime(15)
+    RoundManager.SetCurrentTime(10)
     RoundManager.SetGameState(STATE.END)
 
     PrintMessage(HUD_PRINTCENTER, result)
