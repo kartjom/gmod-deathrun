@@ -1,7 +1,9 @@
 util.AddNetworkString("RoundTimeUpdate")
 util.AddNetworkString("GameStateUpdate")
 
-CreateConVar("dr_round_time", 900, FCVAR_ARCHIVE, "Round time in seconds", 300, 3600)
+local cvar_prepare_time = CreateConVar("dr_preparing_time", 5, FCVAR_ARCHIVE, "Time in seconds for match to start", 5, 15)
+local cvar_round_time = CreateConVar("dr_round_time", 900, FCVAR_ARCHIVE, "Round time in seconds", 300, 3600)
+local cvar_restart_time = CreateConVar("dr_restart_time", 10, FCVAR_ARCHIVE, "Time in seconds for match to restart", 5, 15)
 
 concommand.Add("dr_set_time", function(ply, cmd, args)
     if ( !ply:IsAdmin() ) then return end
@@ -63,7 +65,7 @@ end
 function RoundManager.PrepareStart()
     timer.RemoveAllManaged()
 
-    RoundManager.SetCurrentTime(5)
+    RoundManager.SetCurrentTime(cvar_prepare_time:GetInt())
     RoundManager.SetGameState(STATE.PREPARE)
     RoundManager.RandomizeTeams()
 
@@ -87,7 +89,7 @@ end
 function RoundManager.RoundStart()
     timer.RemoveManaged("PrepareCountdown")
 
-    RoundManager.SetCurrentTime( GetConVar("dr_round_time"):GetInt() )
+    RoundManager.SetCurrentTime(cvar_round_time:GetInt())
     RoundManager.SetGameState(STATE.ACTION)
 
     for k,v in pairs(RoundManager.GetRunners()) do
@@ -117,7 +119,7 @@ end
 function RoundManager.RoundEnd(result)
     timer.RemoveManaged("RoundCountdown")
 
-    RoundManager.SetCurrentTime(10)
+    RoundManager.SetCurrentTime(cvar_restart_time:GetInt())
     RoundManager.SetGameState(STATE.END)
 
     PrintMessage(HUD_PRINTCENTER, result)
