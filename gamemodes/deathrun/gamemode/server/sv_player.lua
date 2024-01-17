@@ -43,10 +43,10 @@ function ply:SetRunner()
     self:Spawn()
 
     self:Give("weapon_crowbar")
-    self:SetJumpPower(160)
+    self:SetJumpPower(180)
 
-    self:SetWalkSpeed(250)
-    self:SetRunSpeed(250)
+    self:SetWalkSpeed(270)
+    self:SetRunSpeed(270)
 end
 
 function ply:SetActivator()
