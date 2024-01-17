@@ -11,6 +11,7 @@ end
 function ply:ResetData()
     self.Initialized = false
 
+    self:SetParent(NULL)
     self:SetGravity(0)
     self:Extinguish()
 

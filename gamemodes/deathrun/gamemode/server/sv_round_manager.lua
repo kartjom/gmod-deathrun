@@ -50,7 +50,7 @@ end
 function RoundManager.AwaitPlayers()
     RoundManager.SetGameState(STATE.AWAIT)
 
-    timer.CreateManaged("AwaitPlayers", 5, 0, function()
+    timer.CreateManaged("AwaitPlayers", 1, 0, function()
         if (player.GetCount() >= 2) then
             timer.RemoveManaged("AwaitPlayers");
 
@@ -116,8 +116,10 @@ function RoundManager.RoundStart()
     end)
 end
 
-function RoundManager.RoundEnd(result)
+function RoundManager.RoundEnd(winnerTeam, result)
     timer.RemoveManaged("RoundCountdown")
+
+    tf_gamerules_handleRoundEnd(winnerTeam)
 
     RoundManager.SetCurrentTime(cvar_restart_time:GetInt())
     RoundManager.SetGameState(STATE.END)
@@ -138,6 +140,7 @@ function RoundManager.RoundRestart()
     timer.RemoveManaged("RestartCountdown")
 
     PrintMessage(HUD_PRINTCENTER, "Restarting")
+
     game.CleanUpMap()
 
     if (player.GetCount() < 2) then
@@ -221,7 +224,7 @@ function RoundManager.CheckForRoundEnd()
     local AlivePlayersCount = #RoundManager.GetPlayers(false)
 
     if (player.GetCount() < 2) then
-        RoundManager.RoundEnd("Not enough players!")
+        RoundManager.RoundEnd(TEAM.NONE, "Not enough players!")
         return
     end
 
@@ -230,18 +233,18 @@ function RoundManager.CheckForRoundEnd()
 
     --WIN RUNNERS
     if (RUNNERS > 0 && ACTIVATORS == 0) then
-        RoundManager.RoundEnd("Runners win!")
+        RoundManager.RoundEnd(TEAM.RUNNER, "Runners win!")
         return
     end
 
     --WIN ACTIVATORS
     if (ACTIVATORS > 0 && RUNNERS == 0) then
-        RoundManager.RoundEnd("Activators win!")
+        RoundManager.RoundEnd(TEAM.ACTIVATOR, "Activators win!")
         return
     end
 
     if (AlivePlayersCount == 0) then
-        RoundManager.RoundEnd("Tie")
+        RoundManager.RoundEnd(TEAM.ACTIVATOR, "Activators win!")
         return
     end
 end

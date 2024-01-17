@@ -6,6 +6,7 @@ STATE = {
 }
 
 TEAM = {
+    NONE = 6969,
     UNASSIGNED = 1001,
     SPECTATOR = 1002,
 }
