@@ -160,6 +160,12 @@ function RoundManager.RoundEnd(winnerTeam, result)
     RoundManager.SetCurrentTime(cvar_restart_time:GetInt())
     RoundManager.SetGameState(STATE.END)
 
+    for k,v in pairs(player.GetAll()) do
+        if (v:Alive() && v:Team() != winnerTeam) then
+            v:StripWeapons()
+        end
+    end
+
     PrintMessage(HUD_PRINTCENTER, result)
 
     timer.CreateManaged("RestartCountdown", 1, 0, function ()

@@ -111,8 +111,18 @@ end)
 hook.Add("EntityTakeDamage", "ActivatorCrushDmgDisable", function(target, dmginfo)
     if (target:IsPlayer() && target:IsActivator() && dmginfo:GetDamageType() == DMG_CRUSH) then return true end
 end)
+hook.Add("EntityTakeDamage", "DamageMultiplier", function(target, dmginfo)
+    if (target:IsPlayer()) then
+        dmginfo:SetDamage(target:GetMaxHealth() / 2)
+    end
+end)
 hook.Add("PlayerShouldTakeDamage", "AntiTeamKill", function(ply, attacker)
 	if (attacker:IsPlayer() && ply:Team() == attacker:Team()) then
+		return false
+	end
+end)
+hook.Add("PlayerShouldTakeDamage", "SpectatorGodMode", function(ply, attacker)
+	if (attacker:IsSpectator()) then
 		return false
 	end
 end)
