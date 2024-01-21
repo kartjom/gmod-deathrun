@@ -19,6 +19,7 @@ include("server/sv_player.lua")
 include("server/sv_spectator.lua")
 
 util.AddNetworkString("SyncTeamCreation")
+util.AddNetworkString("PlaySound")
 
 function GM:PlayerInitialSpawn(ply)
     ply:SyncTeams()
@@ -48,6 +49,20 @@ end
 
 function GM:PlayerDeath(ply)
     ply.NextRespawn = CurTime() + 3
+
+    local runnersRemaining = #RoundManager.GetRunners()
+
+    if (!RoundManager.FirstBlood && runnersRemaining > 1) then
+        RoundManager.FirstBlood = true
+
+        PlaySound(string.format("vo/announcer_am_firstblood0%d.mp3", math.random(1, 6)))
+    end
+
+    if (!RoundManager.LastManAlive && runnersRemaining == 1) then
+        RoundManager.LastManAlive = true
+
+        PlaySound(string.format("vo/announcer_am_lastmanalive0%d.mp3", math.random(1, 4)))
+    end
 end
 
 function GM:PlayerDeathThink(ply)

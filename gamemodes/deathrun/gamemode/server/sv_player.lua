@@ -78,7 +78,19 @@ function ply:SyncTime()
 end
 
 function ply:SyncGameState()
-    net.Start('GameStateUpdate')
+    net.Start("GameStateUpdate")
         net.WriteInt(RoundManager.GameState, 8)
     net.Send(self)
+end
+
+function ply:PlaySound(snd)
+    net.Start("PlaySound")
+        net.WriteString(snd)
+    net.Send(self)
+end
+
+function PlaySound(snd)
+    net.Start("PlaySound")
+        net.WriteString(snd)
+    net.Broadcast()
 end

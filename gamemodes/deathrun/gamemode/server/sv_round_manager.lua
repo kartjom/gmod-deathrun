@@ -1,9 +1,34 @@
 util.AddNetworkString("RoundTimeUpdate")
 util.AddNetworkString("GameStateUpdate")
 
-local cvar_prepare_time = CreateConVar("dr_preparing_time", 5, FCVAR_ARCHIVE, "Time in seconds for match to start", 5, 15)
+local cvar_prepare_time = CreateConVar("dr_preparing_time", 10, FCVAR_ARCHIVE, "Time in seconds for match to start", 10, 15)
 local cvar_round_time = CreateConVar("dr_round_time", 900, FCVAR_ARCHIVE, "Round time in seconds", 300, 3600)
 local cvar_restart_time = CreateConVar("dr_restart_time", 10, FCVAR_ARCHIVE, "Time in seconds for match to restart", 5, 15)
+
+local prepareCountdownAllowedNumbers = {
+    [10] = true,
+    [5] = true,
+    [4] = true,
+    [3] = true,
+    [2] = true,
+    [1] = true,
+}
+
+local endCountdownAllowedNumbers = {
+    [60] = true,
+    [30] = true,
+    [20] = true,
+    [10] = true,
+    [9] = true,
+    [8] = true,
+    [7] = true,
+    [6] = true,
+    [5] = true,
+    [4] = true,
+    [3] = true,
+    [2] = true,
+    [1] = true,
+}
 
 concommand.Add("dr_set_time", function(ply, cmd, args)
     if ( !ply:IsAdmin() ) then return end
@@ -24,16 +49,18 @@ end)
 RoundManager = {}
 RoundManager.CurrentTime = 0
 RoundManager.GameState = STATE.AWAIT
+RoundManager.FirstBlood = false
+RoundManager.LastManAlive = false
 
 function RoundManager.BroadcastRoundTime()
     net.Start("RoundTimeUpdate")
-        net.WriteInt(RoundManager.CurrentTime, 32)
+        net.WriteUInt(RoundManager.CurrentTime, 16)
     net.Broadcast()
 end
 
 function RoundManager.BroadcastGameState()
     net.Start("GameStateUpdate")
-        net.WriteInt(RoundManager.GameState, 8)
+        net.WriteInt(RoundManager.GameState, 4)
     net.Broadcast()
 end
 
@@ -78,10 +105,21 @@ function RoundManager.PrepareStart()
     end
 
     timer.CreateManaged("PrepareCountdown", 1, 0, function()
+        
+        print("////////////")
+        print(RoundManager.CurrentTime)
+        if (prepareCountdownAllowedNumbers[RoundManager.CurrentTime]) then
+            print(string.format("vo/announcer_begins_%dsec.mp3", RoundManager.CurrentTime))
+            PlaySound(string.format("vo/announcer_begins_%dsec.mp3", RoundManager.CurrentTime))
+        end
+
         RoundManager.SetCurrentTime(RoundManager.CurrentTime - 1)
+
         if(RoundManager.CurrentTime <= 0) then
             PrintMessage(HUD_PRINTCENTER, "GAME STARTED")
             RoundManager.RoundStart()
+
+            PlaySound(string.format("vo/announcer_am_roundstart0%d.mp3", math.random(1, 4)))
         end
     end)
 end
@@ -141,7 +179,11 @@ function RoundManager.RoundRestart()
 
     PrintMessage(HUD_PRINTCENTER, "Restarting")
 
+    math.randomseed(os.time() + os.clock() + tonumber(tostring({}):sub(8)) + math.floor(math.random() * 1000000))
     game.CleanUpMap()
+
+    RoundManager.FirstBlood = false
+    RoundManager.LastManAlive = false
 
     if (player.GetCount() < 2) then
         RoundManager.AwaitPlayers()
@@ -250,7 +292,6 @@ function RoundManager.CheckForRoundEnd()
 end
 
 function RoundManager.RandomizeTeams()
-    math.randomseed(os.time() * math.random(1, 9))
     local Players = player.GetAll()
 
     -- Activator

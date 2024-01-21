@@ -11,3 +11,8 @@ net.Receive("SyncTeamCreation", function()
     team.SetUp(TEAM.RUNNER, "Runners", Color(0, 100, 255))
     team.SetUp(TEAM.ACTIVATOR, "Activator", Color(255, 0, 0))
 end)
+
+net.Receive("PlaySound", function()
+    local snd = net.ReadString()
+    surface.PlaySound(snd)
+end)
