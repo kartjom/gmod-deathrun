@@ -3,5 +3,5 @@
 	"title"	"Deathrun"
 	"base"	"base"
 	"menusystem" "1"
-	"maps" "^dr_|^deathrun_"
+	"maps" "^dr_|^deathrun_|^vsh_dr_"
 }

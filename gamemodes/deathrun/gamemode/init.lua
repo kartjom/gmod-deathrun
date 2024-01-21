@@ -112,7 +112,7 @@ hook.Add("EntityTakeDamage", "ActivatorCrushDmgDisable", function(target, dmginf
     if (target:IsPlayer() && target:IsActivator() && dmginfo:GetDamageType() == DMG_CRUSH) then return true end
 end)
 hook.Add("EntityTakeDamage", "DamageMultiplier", function(target, dmginfo)
-    if (target:IsPlayer()) then
+    if (target:IsPlayer() && dmginfo:GetAttacker():IsPlayer()) then
         dmginfo:SetDamage(target:GetMaxHealth() / 2)
     end
 end)
