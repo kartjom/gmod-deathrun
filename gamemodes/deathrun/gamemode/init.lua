@@ -108,9 +108,6 @@ hook.Add("PlayerCanPickupWeapon", "SpectatorDisablePickup", function(ply, ent)
     if (ply:IsSpectator()) then return false end
 end)
 
-hook.Add("EntityTakeDamage", "ActivatorCrushDmgDisable", function(target, dmginfo)
-    if (target:IsPlayer() && target:IsActivator() && dmginfo:GetDamageType() == DMG_CRUSH) then return true end
-end)
 hook.Add("EntityTakeDamage", "DamageMultiplier", function(target, dmginfo)
     if (target:IsPlayer() && dmginfo:GetAttacker():IsPlayer()) then
         dmginfo:SetDamage(target:GetMaxHealth() / 2)

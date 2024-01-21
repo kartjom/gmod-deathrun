@@ -150,6 +150,8 @@ function RoundManager.RoundStart()
 end
 
 function RoundManager.RoundEnd(winnerTeam, result)
+    if (RoundManager.GameState == STATE.END) then return end
+
     timer.RemoveAllManaged()
 
     net.Start("RoundEnd")
