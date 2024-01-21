@@ -29,6 +29,8 @@ function GM:PlayerInitialSpawn(ply)
         net.WriteInt(RoundManager.GameState, 8)
     net.Send(ply)
 
+    ply:SetModel(string.format("models/player/group01/male_0%d.mdl", math.random(1, 9)))
+
     ply.InitialSpawn = true
 end
 

@@ -59,7 +59,7 @@ end
 
 function RoundManager.BroadcastGameState()
     net.Start("GameStateUpdate")
-        net.WriteInt(RoundManager.GameState, 4)
+        net.WriteUInt(RoundManager.GameState, 4)
     net.Broadcast()
 end
 

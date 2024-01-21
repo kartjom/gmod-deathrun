@@ -39,6 +39,8 @@ function ply:SetRunner()
     self.Initialized = true
     
     self:SetTeam(TEAM.RUNNER)
+    self:SetPlayerColor(team.GetColor(self:Team()):ToVector())
+
     self:UnSpectate()
     self:Spawn()
 
@@ -55,6 +57,8 @@ function ply:SetActivator()
     self.Initialized = true
 
     self:SetTeam(TEAM.ACTIVATOR)
+    self:SetPlayerColor(team.GetColor(self:Team()):ToVector())
+
     self:UnSpectate()
     self:Spawn()
 
@@ -68,20 +72,20 @@ end
 
 function ply:SyncTeams()
     net.Start("SyncTeamCreation")
-        net.WriteInt(TEAM.RUNNER, 16)
-        net.WriteInt(TEAM.ACTIVATOR, 16)
+        net.WriteUInt(TEAM.RUNNER, 4)
+        net.WriteUInt(TEAM.ACTIVATOR, 4)
     net.Send(self)
 end
 
 function ply:SyncTime()
     net.Start("RoundTimeUpdate")
-        net.WriteInt(RoundManager.CurrentTime, 32)
+        net.WriteUInt(RoundManager.CurrentTime, 16)
     net.Send(self)
 end
 
 function ply:SyncGameState()
     net.Start("GameStateUpdate")
-        net.WriteInt(RoundManager.GameState, 8)
+        net.WriteUInt(RoundManager.GameState, 4)
     net.Send(self)
 end
 
