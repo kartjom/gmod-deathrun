@@ -122,7 +122,7 @@ hook.Add("PlayerShouldTakeDamage", "AntiTeamKill", function(ply, attacker)
 	end
 end)
 hook.Add("PlayerShouldTakeDamage", "SpectatorGodMode", function(ply, attacker)
-	if (attacker:IsSpectator()) then
+	if (ply:IsSpectator()) then
 		return false
 	end
 end)
