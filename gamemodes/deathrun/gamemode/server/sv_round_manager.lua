@@ -78,7 +78,7 @@ function RoundManager.AwaitPlayers()
 
     timer.CreateManaged("AwaitPlayers", 1, 0, function()
         if (player.GetCount() >= 2) then
-            timer.RemoveManaged("AwaitPlayers");
+            timer.RemoveAllManaged()
 
             PrintMessage(HUD_PRINTTALK, "Starting game in 5 seconds...")
             timer.CreateManaged("GameStart", 5, 1, function()
@@ -120,7 +120,7 @@ function RoundManager.PrepareStart()
 end
 
 function RoundManager.RoundStart()
-    timer.RemoveManaged("PrepareCountdown")
+    timer.RemoveAllManaged()
 
     RoundManager.SetCurrentTime(cvar_round_time:GetInt())
     RoundManager.SetGameState(STATE.ACTION)
@@ -149,7 +149,7 @@ function RoundManager.RoundStart()
 end
 
 function RoundManager.RoundEnd(winnerTeam, result)
-    timer.RemoveManaged("RoundCountdown")
+    timer.RemoveAllManaged()
 
     net.Start("RoundEnd")
         net.WriteUInt(winnerTeam, 3)
@@ -177,9 +177,7 @@ function RoundManager.RoundEnd(winnerTeam, result)
 end
 
 function RoundManager.RoundRestart()
-    timer.RemoveManaged("PrepareCountdown")
-    timer.RemoveManaged("RoundCountdown")
-    timer.RemoveManaged("RestartCountdown")
+    timer.RemoveAllManaged()
 
     PrintMessage(HUD_PRINTCENTER, "Restarting")
 
