@@ -20,6 +20,7 @@ include("server/sv_spectator.lua")
 
 util.AddNetworkString("SyncTeamCreation")
 util.AddNetworkString("PlaySound")
+util.AddNetworkString("RoundEnd")
 
 function GM:PlayerInitialSpawn(ply)
     ply:SyncTeams()

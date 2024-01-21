@@ -99,3 +99,15 @@ end
 function ENT:UpdateTransmitState()	
 	return TRANSMIT_NEVER
 end
+
+function team_round_timer_OnSetupStart()
+    for k,v in pairs(ents.FindByClass("team_round_timer")) do
+        v:FireOutputIfAvailable("OnSetupStart")
+    end
+end
+
+function team_round_timer_OnSetupFinished()
+    for k,v in pairs(ents.FindByClass("team_round_timer")) do
+        v:FireOutputIfAvailable("OnSetupFinished")
+    end
+end

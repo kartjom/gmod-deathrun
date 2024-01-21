@@ -1,7 +1,6 @@
 util.AddNetworkString("RoundTimeUpdate")
 util.AddNetworkString("GameStateUpdate")
 
-local cvar_prepare_time = CreateConVar("dr_preparing_time", 10, FCVAR_ARCHIVE, "Time in seconds for match to start", 10, 15)
 local cvar_round_time = CreateConVar("dr_round_time", 900, FCVAR_ARCHIVE, "Round time in seconds", 300, 3600)
 local cvar_restart_time = CreateConVar("dr_restart_time", 10, FCVAR_ARCHIVE, "Time in seconds for match to restart", 5, 15)
 
@@ -19,8 +18,8 @@ local endCountdownAllowedNumbers = {
     [30] = true,
     [20] = true,
     [10] = true,
-    [9] = true,
-    [8] = true,
+    --[9] = true,
+    --[8] = true,
     [7] = true,
     [6] = true,
     [5] = true,
@@ -92,7 +91,7 @@ end
 function RoundManager.PrepareStart()
     timer.RemoveAllManaged()
 
-    RoundManager.SetCurrentTime(cvar_prepare_time:GetInt())
+    RoundManager.SetCurrentTime(11)
     RoundManager.SetGameState(STATE.PREPARE)
     RoundManager.RandomizeTeams()
 
@@ -100,26 +99,22 @@ function RoundManager.PrepareStart()
         v:SetMoveType(MOVETYPE_NONE)
     end
 
-    for k,v in pairs(ents.FindByClass("team_round_timer")) do
-        v:FireOutputIfAvailable("OnSetupStart")
-    end
+    team_round_timer_OnSetupStart()
 
-    timer.CreateManaged("PrepareCountdown", 1, 0, function()
-        
-        print("////////////")
-        print(RoundManager.CurrentTime)
-        if (prepareCountdownAllowedNumbers[RoundManager.CurrentTime]) then
-            print(string.format("vo/announcer_begins_%dsec.mp3", RoundManager.CurrentTime))
-            PlaySound(string.format("vo/announcer_begins_%dsec.mp3", RoundManager.CurrentTime))
+    timer.CreateManaged("PrepareCountdown", 1, 0, function()       
+        if (prepareCountdownAllowedNumbers[RoundManager.CurrentTime - 1]) then
+            PlaySound(string.format("vo/announcer_begins_%dsec.mp3", RoundManager.CurrentTime - 1))
         end
 
         RoundManager.SetCurrentTime(RoundManager.CurrentTime - 1)
 
-        if(RoundManager.CurrentTime <= 0) then
+        if(RoundManager.CurrentTime < 0) then
             PrintMessage(HUD_PRINTCENTER, "GAME STARTED")
             RoundManager.RoundStart()
 
-            PlaySound(string.format("vo/announcer_am_roundstart0%d.mp3", math.random(1, 4)))
+            local startSnd = math.random(1, 4)
+            if (startSnd == 2) then startSnd = 1 end
+            PlaySound(string.format("vo/announcer_am_roundstart0%d.mp3", startSnd))
         end
     end)
 end
@@ -134,19 +129,18 @@ function RoundManager.RoundStart()
         v:SetMoveType(MOVETYPE_WALK)
     end
 
-    for k,v in pairs(ents.FindByClass("team_round_timer")) do
-        v:FireOutputIfAvailable("OnSetupFinished")
-    end
-
-    for k,v in pairs(ents.FindByClass("tf_logic_arena")) do
-        v:TriggerOutput("OnArenaRoundStart")
-    end
+    team_round_timer_OnSetupFinished()
+    tf_logic_arena_OnArenaRoundStart()
 
     timer.CreateManaged("RoundCountdown", 1, 0, function ()
+        if (endCountdownAllowedNumbers[RoundManager.CurrentTime - 1]) then
+            PlaySound(string.format("vo/announcer_ends_%dsec.mp3", RoundManager.CurrentTime - 1))
+        end
+
         RoundManager.SetCurrentTime(RoundManager.CurrentTime - 1)
 
-        if(RoundManager.CurrentTime <= 0) then
-            RoundManager.RoundEnd("Time Limit Reached")
+        if(RoundManager.CurrentTime < 0) then
+            RoundManager.RoundEnd(TEAM.ACTIVATOR, "Time Limit Reached")
             return
         end
 
@@ -157,6 +151,10 @@ end
 function RoundManager.RoundEnd(winnerTeam, result)
     timer.RemoveManaged("RoundCountdown")
 
+    net.Start("RoundEnd")
+        net.WriteUInt(winnerTeam, 3)
+    net.Broadcast()
+
     tf_gamerules_handleRoundEnd(winnerTeam)
 
     RoundManager.SetCurrentTime(cvar_restart_time:GetInt())
@@ -166,7 +164,7 @@ function RoundManager.RoundEnd(winnerTeam, result)
 
     timer.CreateManaged("RestartCountdown", 1, 0, function ()
         RoundManager.SetCurrentTime(RoundManager.CurrentTime - 1)
-        if(RoundManager.CurrentTime <= 0) then
+        if(RoundManager.CurrentTime < 0) then
             RoundManager.RoundRestart()
         end
     end)

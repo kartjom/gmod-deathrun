@@ -10,17 +10,17 @@ hook.Add("HUDPaint", "HUD_DrawRoundTime", function()
         align = TEXT_ALIGN_LEFT
     end
 
-    if(CurrentTime > 0 && GameState == STATE.PREPARE) then
+    if(CurrentTime >= 0 && GameState == STATE.PREPARE) then
         text = "Starting in " .. string.FormattedTime(CurrentTime, "%02i:%02i")
         align = TEXT_ALIGN_LEFT
     end
 
-    if(CurrentTime > 0 && GameState == STATE.ACTION) then
+    if(CurrentTime >= 0 && GameState == STATE.ACTION) then
         text = string.FormattedTime(CurrentTime, "%02i:%02i")
         align = TEXT_ALIGN_LEFT
     end
     
-    if(CurrentTime > 0 && GameState == STATE.END) then
+    if(CurrentTime >= 0 && GameState == STATE.END) then
         text = "Restarting in " .. string.FormattedTime(CurrentTime, "%02i:%02i")
         align = TEXT_ALIGN_LEFT
     end

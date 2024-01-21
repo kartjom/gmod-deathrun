@@ -16,3 +16,9 @@ end
 function ENT:UpdateTransmitState()	
 	return TRANSMIT_NEVER
 end
+
+function tf_logic_arena_OnArenaRoundStart()
+    for k,v in pairs(ents.FindByClass("tf_logic_arena")) do
+        v:TriggerOutput("OnArenaRoundStart")
+    end
+end

@@ -1,3 +1,5 @@
+if (CLIENT) then return end
+
 SWEP.Target = "weapon_crowbar"
 
 function SWEP:Initialize()
