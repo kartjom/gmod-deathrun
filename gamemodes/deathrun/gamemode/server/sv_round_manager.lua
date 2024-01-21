@@ -115,6 +115,7 @@ function RoundManager.PrepareStart()
             local startSnd = math.random(1, 4)
             if (startSnd == 2) then startSnd = 1 end
             PlaySound(string.format("vo/announcer_am_roundstart0%d.mp3", startSnd))
+            PlaySound("ambient/siren.wav")
         end
     end)
 end
