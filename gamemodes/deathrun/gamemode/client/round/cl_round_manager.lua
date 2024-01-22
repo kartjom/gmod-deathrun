@@ -1,12 +1,14 @@
-CurrentTime = 0;
-GameState = STATE.AWAIT;
+RoundManager = {}
+
+RoundManager.CurrentTime = 0;
+RoundManager.GameState = STATE.AWAIT;
 
 net.Receive("RoundTimeUpdate", function()
-    CurrentTime = net.ReadUInt(16)
+    RoundManager.CurrentTime = net.ReadUInt(16)
 end)
 
 net.Receive("GameStateUpdate", function()
-    GameState = net.ReadUInt(4)
+    RoundManager.GameState = net.ReadUInt(4)
 end)
 
 net.Receive("RoundEnd", function()

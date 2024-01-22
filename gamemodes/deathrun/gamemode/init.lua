@@ -2,8 +2,8 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 
-AddCSLuaFile("client/cl_round_manager.lua")
-AddCSLuaFile("client/cl_hud.lua")
+AddCSLuaFile("client/round/cl_round_manager.lua")
+AddCSLuaFile("client/hud/cl_hud.lua")
 
 /* Include Server Files */
 include("shared.lua")
