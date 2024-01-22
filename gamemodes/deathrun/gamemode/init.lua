@@ -7,98 +7,20 @@ AddCSLuaFile("client/cl_hud.lua")
 
 /* Include Server Files */
 include("shared.lua")
-include("server/sv_timers.lua")
-include("server/sv_round_manager.lua")
+
+include("server/utils/sv_timers.lua")
+
 include("server/sv_entry_point.lua")
+include("server/round/sv_round.lua")
 
-include("server/sv_utils.lua")
-include("server/sv_spawns.lua")
+include("server/internals/sv_network.lua")
+include("server/internals/sv_map.lua")
+include("server/internals/sv_spawns.lua")
+include("server/internals/sv_player.lua")
 
-include("server/sv_entity.lua")
-include("server/sv_player.lua")
-include("server/sv_spectator.lua")
-
-util.AddNetworkString("SyncTeamCreation")
-util.AddNetworkString("PlaySound")
-util.AddNetworkString("RoundEnd")
-
-function GM:PlayerInitialSpawn(ply)
-    ply:SyncTeams()
-
-    net.Start('GameStateUpdate')
-        net.WriteInt(RoundManager.GameState, 8)
-    net.Send(ply)
-
-    ply:SetModel(string.format("models/player/group01/male_0%d.mdl", math.random(1, 9)))
-
-    ply.InitialSpawn = true
-end
-
-function GM:PlayerSpawn(ply)
-    if (ply.Initialized == nil) then ply.Initialized = false end
-
-	if (!ply.Initialized) then
-		ply.Initialized = true
-
-		if (RoundManager.GameState == STATE.AWAIT) then
-			ply:SetRunner()
-		else
-			ply:SetSpectator()
-		end
-	end
-
-	ply.InitialSpawn = false
-end
-
-function GM:PlayerDeath(ply)
-    ply.NextRespawn = CurTime() + 3
-
-    if (ply:Team() == TEAM.RUNNER) then
-        local runnersRemaining = #RoundManager.GetRunners()
-    
-        if (!RoundManager.FirstBlood && runnersRemaining > 1) then
-            RoundManager.FirstBlood = true
-    
-            PlaySound(string.format("vo/announcer_am_firstblood0%d.mp3", math.random(1, 6)))
-        end
-    
-        if (!RoundManager.LastManAlive && runnersRemaining == 1) then
-            RoundManager.LastManAlive = true
-    
-            PlaySound(string.format("vo/announcer_am_lastmanalive0%d.mp3", math.random(1, 4)))
-        end
-    end
-end
-
-function GM:PlayerDeathThink(ply)
-    if (CurTime() > ply.NextRespawn) then
-        ply.Initialized = false
-        ply:Spawn()
-        return
-    end
-
-    return false
-end
-
-function GM:PlayerNoClip()
-    return true
-end
-
-function GM:PlayerSpawnAsSpectator(ply)
-    ply:SetSpectator()
-end
-
-function GM:CanPlayerSuicide(ply)
-    return ply:IsRunner() || ply:IsActivator()
-end
-
-function GM:GetFallDamage(ply, speed)
-    return (5 * ( speed / 300 ))
-end
-
-function GM:IsSpawnpointSuitable(ply, spawnpoint, makeSuitable)
-    return true
-end
+include("server/extensions/sv_entity.lua")
+include("server/extensions/sv_player.lua")
+include("server/extensions/sv_spectator.lua")
 
 hook.Add("AllowPlayerPickup", "SpectatorDisablePickup", function(ply, ent)
     if (ply:IsSpectator()) then return false end

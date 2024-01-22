@@ -80,3 +80,8 @@ function GM:PlayerSelectSpawn(ply, transiton)
 
 	return ChosenSpawnPoint
 end
+
+-- Prevent spawnkill
+function GM:IsSpawnpointSuitable(ply, spawnpoint, makeSuitable)
+    return true
+end

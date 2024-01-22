@@ -1,3 +1,5 @@
+DeriveGamemode("base")
+
 STATE = {
 	AWAIT = 0,
 	PREPARE = 1,
@@ -16,5 +18,3 @@ MAPVER = {
     TF2 = 1,
     CSS = 2,
 }
-
-DeriveGamemode("base")
