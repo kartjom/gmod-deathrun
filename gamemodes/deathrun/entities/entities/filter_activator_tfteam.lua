@@ -7,7 +7,7 @@ end
 
 function ENT:PassesFilter(trigger, ent)
     local teamNum = self:GetInternalVariable("TeamNum")
-	return ent:IsPlayer() && ent:Team() == teamNum
+	return ent:IsPlayer() && !ent:IsSpectator() && ent:Team() == teamNum
 end
 
 function ENT:UpdateTransmitState()	
