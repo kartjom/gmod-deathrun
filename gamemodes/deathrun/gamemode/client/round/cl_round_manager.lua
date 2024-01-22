@@ -13,13 +13,14 @@ end)
 
 net.Receive("RoundEnd", function()
     local winnerTeam = net.ReadUInt(3)
+    local plyTeam = LocalPlayer():Team()
 
     if (winnerTeam == TEAM.NONE) then
         surface.PlaySound("vo/announcer_stalemate.mp3")
         return
     end
 
-    if (LocalPlayer():Team() == winnerTeam) then
+    if (plyTeam == winnerTeam || (plyTeam == TEAM.SPECTATOR && winnerTeam == TEAM.RUNNER)) then
         surface.PlaySound("ui/mm_match_end_win_music_casual.wav")
     else
         surface.PlaySound("ui/mm_match_end_lose_music_casual.wav")
