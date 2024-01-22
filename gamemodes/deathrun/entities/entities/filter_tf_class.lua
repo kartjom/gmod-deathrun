@@ -5,9 +5,9 @@ function ENT:KeyValue(key, value)
 	self:StoreValue(key, value)
 end
 
-function ENT:AcceptInput(inputName, activator, caller, data)
-    PrintMessage(HUD_PRINTTALK, "[DEV] filter_tf_class "..inputName..": "..tostring(data))
-end
+-- function ENT:AcceptInput(inputName, activator, caller, data)
+--     PrintMessage(HUD_PRINTTALK, "[DEV] filter_tf_class "..inputName..": "..tostring(data))
+-- end
 
 function ENT:PassesFilter(trigger, ent)
 	-- TODO: handle 'Negated' key value

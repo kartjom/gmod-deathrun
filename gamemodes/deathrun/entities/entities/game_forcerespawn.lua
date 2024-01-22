@@ -23,7 +23,7 @@ function ENT:AcceptInput(inputName, activator, caller, data)
 
         self:TriggerOutput("OnForceRespawn")
     else
-        PrintMessage(HUD_PRINTTALK, "[DEV] Unhandled input: game_forcerespawn "..inputName..": "..tostring(data))
+        --PrintMessage(HUD_PRINTTALK, "[DEV] Unhandled input: game_forcerespawn "..inputName..": "..tostring(data))
     end
 end
 

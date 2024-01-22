@@ -41,7 +41,7 @@ function ENT:AcceptInput(inputName, activator, caller, data)
     if (string.lower(inputName) == "disable") then self.Enabled = false end
     if (string.lower(inputName) == "toggle") then self.Enabled = !self.Enabled end
 
-    PrintMessage(HUD_PRINTTALK, "[DEV] trigger_teleport_relative "..inputName..": "..tostring(data))
+    --PrintMessage(HUD_PRINTTALK, "[DEV] trigger_teleport_relative "..inputName..": "..tostring(data))
 end
 
 function ENT:UpdateTransmitState()	

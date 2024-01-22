@@ -7,9 +7,9 @@ function ENT:KeyValue(key, value)
 	end
 end
 
-function ENT:AcceptInput(inputName, activator, caller, data)
-    PrintMessage(HUD_PRINTTALK, "[DEV] tf_gamerules "..inputName..": "..tostring(data))
-end
+-- function ENT:AcceptInput(inputName, activator, caller, data)
+--     PrintMessage(HUD_PRINTTALK, "[DEV] tf_gamerules "..inputName..": "..tostring(data))
+-- end
 
 function ENT:UpdateTransmitState()	
 	return TRANSMIT_NEVER

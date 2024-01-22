@@ -11,7 +11,10 @@ function GM:LookupSpawns()
         local tfSpawns = ents.FindByClass("info_player_teamspawn")
         for k,v in pairs(tfSpawns) do
             local TeamNum = v:GetInternalVariable("TeamNum")
-            table.insert(self.TeamSpawns[TeamNum], v)
+
+			if (TeamNum == TEAM.RUNNER || TeamNum == TEAM.ACTIVATOR) then
+            	table.insert(self.TeamSpawns[TeamNum], v)
+			end
         end
     end
 end
