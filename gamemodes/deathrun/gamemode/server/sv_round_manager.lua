@@ -187,6 +187,12 @@ function RoundManager.RoundRestart()
     math.randomseed(os.time() + os.clock() + tonumber(tostring({}):sub(8)) + math.floor(math.random() * 1000000))
     game.CleanUpMap()
 
+    for k,v in pairs(ents.FindByClass("func_door")) do
+        if (v:GetCollisionGroup() == COLLISION_GROUP_PASSABLE_DOOR) then
+            v:SetCollisionGroup(COLLISION_GROUP_NONE)
+        end
+    end
+
     RoundManager.FirstBlood = false
     RoundManager.LastManAlive = false
 
