@@ -3,6 +3,7 @@ include("shared.lua")
 /* Include Client Files (see init.lua) */
 include("client/round/cl_round_manager.lua")
 include("client/hud/cl_hud.lua")
+include("client/hud/cl_scoreboard.lua")
 
 net.Receive("SyncTeamCreation", function()
     TEAM.RUNNER = net.ReadUInt(4)

@@ -4,6 +4,7 @@ AddCSLuaFile("shared.lua")
 
 AddCSLuaFile("client/round/cl_round_manager.lua")
 AddCSLuaFile("client/hud/cl_hud.lua")
+AddCSLuaFile("client/hud/cl_scoreboard.lua")
 
 /* Include Server Files */
 include("shared.lua")

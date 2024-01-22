@@ -30,3 +30,5 @@ TFCLASS = {
     SPY = 8,
     ENGINEER = 9,
 }
+
+team.SetUp(TEAM.SPECTATOR, "Spectator", Color(128, 128, 128))
