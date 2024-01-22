@@ -104,13 +104,31 @@ end
 
 function RoundManager.RandomizeTeams()
     local Players = player.GetAll()
+    table.Shuffle(Players)
+
+    -- pick random player that hasn't been activator yet
+    local activator = nil
+    for k,v in ipairs(Players) do
+        if (!v.WasActivator) then
+            activator = v
+            break
+        end
+    end
+
+    -- reset queue if everyone was activator
+    if (activator == nil) then
+        for k,v in ipairs(Players) do
+            v.WasActivator = false
+        end
+
+        activator = Players[1]
+    end
 
     -- Activator
-    local randomPlayerIndex = math.random(1, #Players)
-    local randomPlayer = Players[randomPlayerIndex]
+    activator:SetActivator()
+    activator.WasActivator = true
 
-    randomPlayer:SetActivator()
-    table.remove(Players, randomPlayerIndex)
+    table.RemoveByValue(Players, activator)
 
     -- Runners
     for k,v in ipairs(Players) do

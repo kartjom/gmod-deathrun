@@ -8,6 +8,7 @@ function GM:PlayerInitialSpawn(ply)
     ply:SetModel(string.format("models/player/group01/male_0%d.mdl", math.random(1, 9)))
 
     ply.InitialSpawn = true
+    ply.WasActivator = false
 end
 
 function GM:PlayerSpawn(ply)
