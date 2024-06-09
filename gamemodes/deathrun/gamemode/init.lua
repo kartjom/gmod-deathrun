@@ -54,3 +54,9 @@ hook.Add("EntityKeyValue", "tf2_logic_auto_fix", function(ent, key, value)
         ent:Fire("AddOutput", string.format("%s %s", "OnMapSpawn", value))
     end
 end)
+
+hook.Add("PlayerUse", "DisallowSpectatorUse", function(ply, ent)
+	if (ply:IsSpectator()) then
+		return false
+	end
+end)
