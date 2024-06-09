@@ -38,7 +38,7 @@ function GM:PlayerDeathThink(ply)
 end
 
 function GM:PlayerNoClip()
-    return true
+    return GetConVar("sv_cheats"):GetBool()
 end
 
 function GM:PlayerSpawnAsSpectator(ply)
