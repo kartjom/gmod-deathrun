@@ -60,3 +60,7 @@ function util.GetAlivePlayers()
  
 	return choice
  end
+
+ function string.iequals(a, b)
+	return string.lower(a) == string.lower(b)
+ end

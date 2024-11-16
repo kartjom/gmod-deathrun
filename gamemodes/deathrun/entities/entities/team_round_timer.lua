@@ -2,7 +2,7 @@ ENT.Base = "base_entity"
 ENT.Type = "point"
 
 function ENT:KeyValue(key, value)
-    if (string.Left(key, 2) == "On") then
+    if (string.StartsWith(key, "On")) then
 		self:StoreOutput(key, value)
 	else
         self:StoreValue(key, value)
@@ -46,9 +46,9 @@ function ENT:Initialize()
 end
 
 function ENT:AcceptInput(inputName, activator, caller, data)
-    if (string.lower(inputName) == "enable") then self.Enabled = true end
-    if (string.lower(inputName) == "disable") then self.Enabled = false end
-    if (string.lower(inputName) == "toggle") then self.Enabled = !self.Enabled end
+    if (string.iequals(inputName, "enable")) then self.Enabled = true end
+    if (string.iequals(inputName, "disable")) then self.Enabled = false end
+    if (string.iequals(inputName, "toggle")) then self.Enabled = !self.Enabled end
 
     --PrintMessage(HUD_PRINTTALK, "[DEV] team_round_timer "..inputName..": "..tostring(data))
 end

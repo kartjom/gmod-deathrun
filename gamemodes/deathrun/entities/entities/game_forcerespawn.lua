@@ -2,9 +2,9 @@ ENT.Base = "base_entity"
 ENT.Type = "point"
 
 ENT.AllowedInputs = {
-    ["ForceRespawn"] = true,
-    ["ForceRespawnSwitchTeams"] = true,
-    ["ForceTeamRespawn"] = true
+    ["forcerespawn"] = true,
+    ["forcerespawnswitchteams"] = true,
+    ["forceteamrespawn"] = true
 }
 
 function ENT:KeyValue(key, value)
@@ -14,8 +14,8 @@ function ENT:KeyValue(key, value)
 end
 
 function ENT:AcceptInput(inputName, activator, caller, data)
-    if (self.AllowedInputs[inputName]) then
-        if (inputName == "ForceTeamRespawn" && data != nil) then
+    if (self.AllowedInputs[string.lower(inputName)]) then
+        if ( string.iequals(inputName, "ForceTeamRespawn") && data != nil ) then
             self:ForceTeamRespawn(tonumber(data))
         else
             self:ForceRespawn()

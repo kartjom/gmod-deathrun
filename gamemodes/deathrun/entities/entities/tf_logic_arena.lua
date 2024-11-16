@@ -2,7 +2,7 @@ ENT.Base = "base_entity"
 ENT.Type = "point"
 
 function ENT:KeyValue(key, value)
-    if (string.Left(key, 2) == "On") then
+    if (string.StartsWith(key, "On")) then
 		self:StoreOutput(key, value)
 	else
         self:StoreValue(key, value)
