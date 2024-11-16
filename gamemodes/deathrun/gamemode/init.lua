@@ -52,8 +52,8 @@ function GM:GetFallDamage(ply, speed)
     return (5 * ( speed / 300 ))
 end
 
-function GM:PlayerNoClip()
-    return GetConVar("sv_cheats"):GetBool()
+function GM:PlayerNoClip(ply)
+    return ply:IsAdmin() || GetConVar("sv_cheats"):GetBool()
 end
 
 hook.Add("PlayerDeath", "PlayerDeath", function(ply)
