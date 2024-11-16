@@ -35,11 +35,11 @@ function ENT:Initialize()
         OnFinished = false,
     }
 
-    self.TimerLength = self:GetStoredValue("timer_length", "int") || 0
-    self.MaxLength = self:GetStoredValue("max_length", "int") || 0
-    self.AutoCountdown = self:GetStoredValue("auto_countdown", "bool") || true
-    self.SetupLength = self:GetStoredValue("setup_length", "int") || 0
-    self.ResetTime = self:GetStoredValue("reset_time", "bool") || false
+    self.TimerLength = self:GetStoredValue("timer_length", "int", 0)
+    self.MaxLength = self:GetStoredValue("max_length", "int", 0)
+    self.AutoCountdown = self:GetStoredValue("auto_countdown", "bool", true)
+    self.SetupLength = self:GetStoredValue("setup_length", "int")
+    self.ResetTime = self:GetStoredValue("reset_time", "bool", false)
 
     self.RemainingTime = self.TimerLength
     self.Finished = (self.RemainingTime <= 0)
