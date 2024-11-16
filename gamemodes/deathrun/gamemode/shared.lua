@@ -27,6 +27,8 @@ DEATHRUN = {
     },
 }
 
+include("shared/sh_tf2_particles.lua")
+
 include("shared/player_class/deathrun_base.lua")
 include("shared/player_class/deathrun_runner.lua")
 include("shared/player_class/deathrun_activator.lua")
