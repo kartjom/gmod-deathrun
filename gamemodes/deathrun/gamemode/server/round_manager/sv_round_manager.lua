@@ -73,7 +73,7 @@ function DEATHRUN.RoundManager.RestartRound()
 end
 
 function DEATHRUN.RoundManager.EndRound(winnerTeam, message)
-    if (DEATHRUN.RoundManager.GameState == DEATHRUN.STATE.END) then return end
+    if (DEATHRUN.RoundManager.GetState() == DEATHRUN.STATE.END) then return end
     DEATHRUN.RoundManager.SetState(DEATHRUN.STATE.END)
 
     DEATHRUN.RoundManager.BroadcastRoundEnd(winnerTeam)
