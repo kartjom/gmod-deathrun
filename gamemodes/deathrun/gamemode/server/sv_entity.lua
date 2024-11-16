@@ -1,3 +1,9 @@
+hook.Add("EntityKeyValue", "DEATHRUN.tf2_logic_auto_fix", function(ent, key, value)
+    if (ent:GetClass() == "logic_auto" && (key == "OnMultiNewMap" || key == "OnMultiNewRound")) then
+        ent:Fire("AddOutput", string.format("OnMapSpawn %s", value))
+    end
+end)
+
 local ent = FindMetaTable("Entity")
 
 function ent:StoreValue(key, value)

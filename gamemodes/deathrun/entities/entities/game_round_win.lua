@@ -4,7 +4,7 @@ ENT.Type = "point"
 function ENT:AcceptInput(inputName, activator, caller, data)
     if (inputName == "RoundWin") then
         local winTeam = self:GetInternalVariable("TeamNum")
-        RoundManager.RoundEnd(winTeam, (winTeam == 2 and "Runners" or "Activator").." win!")
+        DEATHRUN.RoundManager.EndRound(winTeam, team.GetName(winTeam).." win!")
     end
 end
 

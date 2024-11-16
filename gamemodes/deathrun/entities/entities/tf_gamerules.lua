@@ -17,9 +17,9 @@ end
 
 function tf_gamerules_handleRoundEnd(winnerTeam)
     for k,v in pairs(ents.FindByClass("tf_gamerules")) do
-        if (winnerTeam == TEAM.RUNNER) then
+        if (winnerTeam == DEATHRUN.TeamRunner()) then
             v:TriggerOutput("OnWonByTeam1", v)
-        elseif (winnerTeam == TEAM.ACTIVATOR) then
+        elseif (winnerTeam == DEATHRUN.TeamActivator()) then
             v:TriggerOutput("OnWonByTeam2", v)
         else
             v:TriggerOutput("OnWonByTeam1", v)

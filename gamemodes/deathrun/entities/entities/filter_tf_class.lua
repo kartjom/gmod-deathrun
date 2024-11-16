@@ -13,7 +13,7 @@ function ENT:PassesFilter(trigger, ent)
 	-- TODO: handle 'Negated' key value
 
 	local tfclass = self:GetStoredValue("tfclass", "int")
-	return ent:IsPlayer() && !ent:IsSpectator() && tfclass == TFCLASS.SCOUT -- only scout will trigger OnPass
+	return ent:IsPlayer() && !ent:IsSpectator() && ent:GetTFClass() == tfclass
 end
 
 function ENT:UpdateTransmitState()

@@ -1,4 +1,6 @@
-hook.Add("Think", "ScoreboardControls", function()
+AddCSLuaFile()
+
+hook.Add("Think", "DEATHRUN.ScoreboardControls", function()
     if (IsValid(Scoreboard) && IsValid(Scrollbar) && input.IsMouseDown(MOUSE_RIGHT)) then
         gui.EnableScreenClicker(true)
     end
@@ -39,13 +41,23 @@ function GM:ScoreboardShow()
     -- Players
     local players = player.GetAll()
     table.sort(players, function(a, b)
-        local teamPriority = {
-            [TEAM.ACTIVATOR] = 1,
-            [TEAM.RUNNER] = 2,
-            [TEAM.SPECTATOR] = 3,
-        }
-
-        return (teamPriority[a:Team()] || 69) < (teamPriority[b:Team()] || 69)
+        -- Determine the priority of each player
+        local function getPriority(player)
+            if player:IsActivator(false) then
+                return 1 -- Alive Activator
+            elseif player:IsActivator(true) then
+                return 2 -- Dead Activator
+            elseif player:IsRunner(false) then
+                return 3 -- Alive Runner
+            elseif player:IsRunner(true) then
+                return 4 -- Dead Runner
+            else
+                return 5 -- Anything else
+            end
+        end
+    
+        -- Compare priorities
+        return getPriority(a) < getPriority(b)
     end)
 
     for k,v in ipairs(players) do

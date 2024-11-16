@@ -1,62 +1,76 @@
-/* AddCSLuaFile */
-AddCSLuaFile("cl_init.lua")
-AddCSLuaFile("shared.lua")
-
-AddCSLuaFile("client/round/cl_round_manager.lua")
-AddCSLuaFile("client/hud/cl_hud.lua")
-AddCSLuaFile("client/hud/cl_scoreboard.lua")
+/* Network Strings */
+util.AddNetworkString("DEATHRUN.PlaySound")
+util.AddNetworkString("DEATHRUN.RoundEnd")
 
 /* Include Server Files */
 include("shared.lua")
-
-include("server/utils/sv_timers.lua")
-
+include("server/sv_entity.lua")
+include("server/sv_player.lua")
+include("server/sv_map.lua")
+include("server/sv_spectator.lua")
 include("server/sv_entry_point.lua")
-include("server/round/sv_round.lua")
+include("server/round_manager/sv_round_manager.lua")
+include("server/round_manager/sv_round_utils.lua")
 
-include("server/internals/sv_network.lua")
-include("server/internals/sv_map.lua")
-include("server/internals/sv_spawns.lua")
-include("server/internals/sv_player.lua")
+function GM:PlayerInitialSpawn(ply)
+	ply.InitialSpawn = true
+end
 
-include("server/extensions/sv_entity.lua")
-include("server/extensions/sv_player.lua")
-include("server/extensions/sv_spectator.lua")
+function GM:PlayerSpawn(ply)
+	if (ply.InitialSpawn) then
+		ply.InitialSpawn = nil
 
-hook.Add("AllowPlayerPickup", "SpectatorDisablePickup", function(ply, ent)
-    if (ply:IsSpectator()) then return false end
-end)
-hook.Add("PlayerCanPickupItem", "SpectatorDisablePickup", function(ply, ent)
-    if (ply:IsSpectator()) then return false end
-end)
-hook.Add("PlayerCanPickupWeapon", "SpectatorDisablePickup", function(ply, ent)
-    if (ply:IsSpectator()) then return false end
-end)
+		if (DEATHRUN.RoundManager.GetState() != DEATHRUN.STATE.AWAIT) then
+			ply:SetTeam( DEATHRUN.TeamRunner() )
+			ply:KillSilent()
 
-hook.Add("EntityTakeDamage", "DamageMultiplier", function(target, dmginfo)
-    if (target:IsPlayer() && dmginfo:GetAttacker():IsPlayer() && dmginfo:GetDamageType() == DMG_CLUB) then
-        dmginfo:SetDamage(target:GetMaxHealth() / 2)
-    end
-end)
-hook.Add("PlayerShouldTakeDamage", "AntiTeamKill", function(ply, attacker)
-	if (attacker:IsPlayer() && ply:Team() == attacker:Team()) then
-		return false
+			return
+		else
+			player_manager.SetPlayerClass(ply, "deathrun_runner")
+    		player_manager.RunClass(ply, "SetTeam")
+		end
 	end
-end)
-hook.Add("PlayerShouldTakeDamage", "SpectatorGodMode", function(ply, attacker)
-	if (ply:IsSpectator()) then
-		return false
+
+	player_manager.OnPlayerSpawn(ply, false)
+	player_manager.RunClass(ply, "SetTeam")
+	player_manager.RunClass(ply, "Spawn")
+	player_manager.RunClass(ply, "Loadout")
+	player_manager.RunClass(ply, "SetModel")
+end
+
+function GM:PlayerDeathThink(ply)
+	if (DEATHRUN.RoundManager.GetState() == DEATHRUN.STATE.AWAIT) then
+		ply:Spawn()
+		return
 	end
-end)
 
-hook.Add("EntityKeyValue", "tf2_logic_auto_fix", function(ent, key, value)
-    if (ent:GetClass() == "logic_auto" && (key == "OnMultiNewMap" || key == "OnMultiNewRound")) then
-        ent:Fire("AddOutput", string.format("%s %s", "OnMapSpawn", value))
-    end
-end)
+	DEATHRUN.SpectatorThink(ply)
+	return false
+end
 
-hook.Add("PlayerUse", "DisallowSpectatorUse", function(ply, ent)
-	if (ply:IsSpectator()) then
-		return false
+function GM:GetFallDamage(ply, speed)
+    return (5 * ( speed / 300 ))
+end
+
+function GM:PlayerNoClip()
+    return GetConVar("sv_cheats"):GetBool()
+end
+
+hook.Add("PlayerDeath", "PlayerDeath", function(ply)
+	if (DEATHRUN.RoundManager.GetState() != DEATHRUN.STATE.ACTION) then return end
+	if (ply:Team() != DEATHRUN.TeamRunner()) then return end
+
+	local runnersRemaining = #DEATHRUN.RoundManager.GetRunners()
+
+	if (!DEATHRUN.RoundManager.FirstBlood && runnersRemaining > 1) then
+		DEATHRUN.RoundManager.FirstBlood = true
+		
+		PlaySound(string.format("vo/announcer_am_firstblood0%d.mp3", math.random(1, 6)))
+	end
+
+	if (!DEATHRUN.RoundManager.LastManAlive && runnersRemaining == 1) then
+		DEATHRUN.RoundManager.LastManAlive = true
+		
+		PlaySound(string.format("vo/announcer_am_lastmanalive0%d.mp3", math.random(1, 4)))
 	end
 end)

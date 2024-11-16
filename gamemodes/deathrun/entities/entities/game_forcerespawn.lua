@@ -8,7 +8,7 @@ ENT.AllowedInputs = {
 }
 
 function ENT:KeyValue(key, value)
-    if (string.Left(key, 2) == "On") then
+    if (string.StartsWith(key, "On")) then
 		self:StoreOutput(key, value)
     end
 end
@@ -33,7 +33,7 @@ end
 
 function ENT:ForceTeamRespawn(team)
     for k,v in pairs(player.GetAll()) do
-        if (v:IsSpectator() || !v:Alive()) then
+        if (v:IsSpectator()) then
             v:SetRunner()
         end
     end
@@ -43,7 +43,7 @@ function ENT:ForceRespawn()
     for k,v in pairs(player.GetAll()) do
         if (v:IsActivator()) then
             v:SetActivator()
-        elseif (v:IsRunner() || v:IsSpectator() || !v:Alive()) then
+        elseif (v:IsRunner() || v:IsSpectator()) then
             v:SetRunner()
         end
     end
