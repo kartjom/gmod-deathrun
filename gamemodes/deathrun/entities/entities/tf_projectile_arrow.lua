@@ -14,7 +14,7 @@ function ENT:Initialize()
 	self:SetModel("models/weapons/w_models/w_arrow.mdl")
 	self:SetMoveType(MOVETYPE_FLYGRAVITY)
 	self:SetSolid(SOLID_BBOX)
-    self:SetCollisionGroup( COLLISION_GROUP_INTERACTIVE )
+    self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE)
 	self:DrawShadow(false)
     self:SetGravity(0.7)
 	
@@ -44,8 +44,8 @@ function ENT:Touch(ent)
     if ent:IsWorld() then
         self.Stuck = true
 
-        self:SetMoveType( MOVETYPE_NONE )
-        self:PhysicsInit( SOLID_NONE )
+        self:SetMoveType(MOVETYPE_NONE)
+        self:PhysicsInit(SOLID_NONE)
         self:SetPos(self:GetPos() + self:GetForward())
 
         self:EmitSound("Weapon_Arrow.ImpactConcrete")
@@ -64,6 +64,7 @@ function ENT:Touch(ent)
         ent:EmitSound("Weapon_Arrow.ImpactConcrete")
         ParticleEffect("impact_metal", self:GetPos(), Angle(), nil)
 
-        self:Remove()
+        -- Should arrow dissapear?
+        --self:Remove()
     end
 end
