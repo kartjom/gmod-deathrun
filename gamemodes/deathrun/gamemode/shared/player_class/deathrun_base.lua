@@ -18,7 +18,7 @@ end
 
 function PLAYER:Spawn()
     self:SetNetworkedVariables()
-
+	
 	self.Player:UnSpectate()
     self.Player:SetPlayerColor( team.GetColor( self.Player:Team() ):ToVector() )
 end
@@ -27,6 +27,7 @@ function PLAYER:SetModel()
 	local modelname = string.format("models/player/group01/male_0%d.mdl", math.random(1, 9))
 	util.PrecacheModel(modelname)
 	self.Player:SetModel(modelname)
+	self.Player:SetupHands()
 end
 
 function PLAYER:Loadout()
