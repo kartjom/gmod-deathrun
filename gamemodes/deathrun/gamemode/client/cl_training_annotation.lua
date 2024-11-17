@@ -22,15 +22,19 @@ net.Receive("DEATHRUN.ClearAnnotations", function()
     annotations = {}
 end)
 
-local function DrawTrainingAnnotation(text, x, y, width, height)
+local function DrawTrainingAnnotation(text, x, y, min_width)
     local color_blue = Color(88, 133, 162, 255)
     local color_border = Color(247, 231, 198, 255)
     local color_triangle = Color(55, 51, 49, 255)
     local color_text = Color(255, 255, 255, 255)
 
-    width = width or 500
-    height = height or 90
+    surface.SetFont("tf2_font")
+    local w, h = surface.GetTextSize(text)
 
+    width = math.max(w + 60, min_width or 0)
+    height = 90
+
+    -- vertical offset, triangle will be pointing correctly
     y = y - height
 
     local centerX = x
@@ -62,6 +66,7 @@ local function DrawTrainingAnnotation(text, x, y, width, height)
 	draw.NoTexture()
     surface.DrawPoly(triangle)
 
+    -- Triangle background
     local smaller = 3
     triangle = {
         { x = centerX - tw/2 + smaller*3, y = th_off + y + height + smaller },
