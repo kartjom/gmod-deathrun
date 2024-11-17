@@ -30,6 +30,9 @@ function PLAYER:SetModel()
 end
 
 function PLAYER:Loadout()
+	self.Player:StripWeapons()
+	self.Player:RemoveAllAmmo()
+
 	self.Player:Give("weapon_crowbar")
     self.Player:SelectWeapon("weapon_crowbar")
 end
