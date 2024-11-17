@@ -61,7 +61,7 @@ function ENT:FireGrenade()
 end
 
 function ENT:FireArrow()
-    local ent = ents.Create("tf2_arrow")
+    local ent = ents.Create("tf_projectile_arrow")
     ent:SetPos(self:GetPos())
     ent:SetAngles(self:GetAngles())
     ent:Spawn()
