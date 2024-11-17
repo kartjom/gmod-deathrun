@@ -2,6 +2,10 @@
 util.AddNetworkString("DEATHRUN.PlaySound")
 util.AddNetworkString("DEATHRUN.RoundEnd")
 
+util.AddNetworkString("DEATHRUN.ShowAnnotation")
+util.AddNetworkString("DEATHRUN.HideAnnotation")
+util.AddNetworkString("DEATHRUN.ClearAnnotations")
+
 /* Include Server Files */
 include("shared.lua")
 include("server/sv_entity.lua")
