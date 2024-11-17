@@ -23,11 +23,11 @@ function ENT:Initialize()
     util.SpriteTrail(self, 0, Color(255,255,255,255), false, 3, 1, 0.3, 1.0/(96.0 * 1.0), "effects/arrowtrail_red.vmt")
 
     self.Stuck = false
-	self.RemoveArrow = CurTime() + 20
+	self.RemoveAfter = CurTime() + 20
 end
 
 function ENT:Think()
-	if (CurTime() >= self.RemoveArrow) then
+	if (CurTime() >= self.RemoveAfter) then
         return self:Remove()
     end
 
