@@ -47,12 +47,11 @@ end
 
 function ENT:Explode()
     local explode = ents.Create("env_explosion")
-    explode:SetOwner(self.Owner)
     explode:SetPos(self:GetPos())
     explode:Spawn()
     explode:Fire("Explode", 0, 0)
 
-    util.BlastDamage(self, self.Owner, self:GetPos(), self.SplashRadius, self.Damage)
+    util.BlastDamage(self, self:GetOwner(), self:GetPos(), self.SplashRadius, self.Damage)
     
     self:Remove()
 end
