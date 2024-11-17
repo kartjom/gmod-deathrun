@@ -3,7 +3,7 @@ DEFINE_BASECLASS("deathrun_base")
  
 local PLAYER = {}
 
-PLAYER.JumpPower = 180
+PLAYER.JumpPower = 200
 PLAYER.WalkSpeed = 270
 PLAYER.RunSpeed = 270
 
