@@ -8,12 +8,13 @@ end
 
 if (CLIENT) then return end
 
-ENT.Damage = 25
+ENT.Damage = 75
 ENT.SplashRadius = 170
 
 function ENT:Initialize()
     self:SetModel("models/weapons/w_models/w_rocket.mdl")
     self:PhysicsInit(SOLID_VPHYSICS)  
+    self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE)
     self:DrawShadow(false)
 
     local phys = self:GetPhysicsObject()
@@ -23,7 +24,6 @@ function ENT:Initialize()
     self.RocketTrail = ents.Create("info_particle_system")
     self.RocketTrail:SetKeyValue("effect_name", "rockettrail")
     self.RocketTrail:SetParent(self)
-    self.RocketTrail:SetOwner(self)
     self.RocketTrail:SetLocalPos(Vector(0, 0, 0))
     self.RocketTrail:SetLocalAngles(Angle(180, 0, 0))
     self.RocketTrail:Spawn()

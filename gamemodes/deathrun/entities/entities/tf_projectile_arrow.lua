@@ -14,8 +14,9 @@ function ENT:Initialize()
 	self:SetModel("models/weapons/w_models/w_arrow.mdl")
 	self:SetMoveType(MOVETYPE_FLYGRAVITY)
 	self:SetSolid(SOLID_BBOX)
-    self:SetGravity(0.7)
+    self:SetCollisionGroup( COLLISION_GROUP_INTERACTIVE )
 	self:DrawShadow(false)
+    self:SetGravity(0.7)
 	
     local size = 0.25
 	self:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
