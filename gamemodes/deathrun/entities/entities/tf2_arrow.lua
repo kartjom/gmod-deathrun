@@ -27,7 +27,9 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
-	if (CurTime() >= self.RemoveArrow) then self:Remove() end
+	if (CurTime() >= self.RemoveArrow) then
+        return self:Remove()
+    end
 
 	if (!self.Stuck) then
         self:SetAngles( self:GetVelocity():Angle() )
