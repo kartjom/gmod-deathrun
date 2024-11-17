@@ -53,7 +53,13 @@ function ENT:FireWeapon()
 end
 
 function ENT:FireRocket()
-    -- implement
+    local ent = ents.Create("tf_projectile_rocket")
+    ent:Spawn()
+
+    self:ApplyOverrides(ent, ent:GetPhysicsObject())
+
+    ent.Damage = self:GetDamage() || ent.Damage
+    ent.SplashRadius = self:GetSplashRadius() || ent.SplashRadius
 end
 
 function ENT:FireGrenade()
@@ -62,11 +68,9 @@ end
 
 function ENT:FireArrow()
     local ent = ents.Create("tf_projectile_arrow")
-    ent:SetPos(self:GetPos())
-    ent:SetAngles(self:GetAngles())
     ent:Spawn()
 
-    self:ApplyOverrides(ent)
+    self:ApplyOverrides(ent, ent)
 
     ent.Damage = self:GetDamage() || ent.Damage
 end
@@ -119,7 +123,9 @@ function ENT:IsCrit()
     return self:GetStoredValue("Crits", "bool", false)
 end
 
-function ENT:ApplyOverrides(ent)
+function ENT:ApplyOverrides(ent, velocityTarget)
+    ent:SetPos(self:GetPos())
+    ent:SetAngles(self:GetAngles())
     ent:SetOwner(self)
 
     local model = self:GetModelOverride()
@@ -130,12 +136,12 @@ function ENT:ApplyOverrides(ent)
 
     local spread = self:GetSpreadAngle()
     if (spread == nil) then
-        ent:SetVelocity(ent:GetForward() * self:GetSpeed())
+        velocityTarget:SetVelocity(ent:GetForward() * self:GetSpeed())
     else
         local spreadRadians = math.rad(spread)
         local offset = VectorRand() * math.tan(spreadRadians)
         local direction = (ent:GetForward() + offset):GetNormalized()
 
-        ent:SetVelocity(direction * self:GetSpeed())
+        velocityTarget:SetVelocity(direction * self:GetSpeed())
     end
 end
