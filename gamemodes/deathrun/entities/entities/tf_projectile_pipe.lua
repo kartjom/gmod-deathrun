@@ -3,7 +3,7 @@ ENT.Type = "anim"
 ENT.Base = "base_anim"
 
 function ENT:Draw()
-    self.Entity:DrawModel()
+    self:DrawModel()
 end
 
 if (CLIENT) then return end
