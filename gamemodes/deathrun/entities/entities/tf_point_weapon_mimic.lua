@@ -63,7 +63,16 @@ function ENT:FireRocket()
 end
 
 function ENT:FireGrenade()
-    -- implement
+    local ent = ents.Create("tf_projectile_pipe")
+    ent:Spawn()
+
+    local phys = ent:GetPhysicsObject()
+    self:ApplyOverrides(ent, phys)
+
+    phys:AddAngleVelocity(Vector( math.Rand(-500, 500), math.Rand(-500, 500), math.Rand(-500, 500) ))
+
+    ent.Damage = self:GetDamage() || ent.Damage
+    ent.SplashRadius = self:GetSplashRadius() || ent.SplashRadius
 end
 
 function ENT:FireArrow()
