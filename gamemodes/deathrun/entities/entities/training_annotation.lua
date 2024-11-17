@@ -45,3 +45,8 @@ function ENT:Hide()
         net.WriteUInt(self:EntIndex(), 13)
     net.Broadcast()
 end
+
+function training_annotation_ClearAnnotations()
+    net.Start("DEATHRUN.ClearAnnotations")
+    net.Broadcast()
+end

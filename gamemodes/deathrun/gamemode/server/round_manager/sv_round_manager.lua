@@ -50,8 +50,7 @@ function DEATHRUN.RoundManager.RestartRound()
     math.randomseed(os.time() + os.clock() + tonumber(tostring({}):sub(8)) + math.floor(math.random() * 1000000))
     game.CleanUpMap()
 
-    net.Start("DEATHRUN.ClearAnnotations")
-    net.Broadcast()
+    training_annotation_ClearAnnotations()
 
     for k,v in pairs(ents.FindByClass("func_door")) do
         if (v:GetCollisionGroup() == COLLISION_GROUP_PASSABLE_DOOR) then
