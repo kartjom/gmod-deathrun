@@ -58,5 +58,5 @@ function ENT:Explode()
 end
 
 function ENT:OnRemove()
-    self.Trail:Fire("kill", "", 0)
+    if( IsValid(self.Trail) ) then self.Trail:Fire("kill", "", 0) end
 end

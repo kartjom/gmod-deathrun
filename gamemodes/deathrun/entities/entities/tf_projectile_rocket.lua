@@ -21,14 +21,14 @@ function ENT:Initialize()
     phys:SetMass(1)
     phys:EnableGravity(false)
 
-    self.RocketTrail = ents.Create("info_particle_system")
-    self.RocketTrail:SetKeyValue("effect_name", "rockettrail")
-    self.RocketTrail:SetParent(self)
-    self.RocketTrail:SetLocalPos(Vector(0, 0, 0))
-    self.RocketTrail:SetLocalAngles(Angle(180, 0, 0))
-    self.RocketTrail:Spawn()
-    self.RocketTrail:Activate()
-    self.RocketTrail:Fire("start", "", 0)
+    self.Trail = ents.Create("info_particle_system")
+    self.Trail:SetKeyValue("effect_name", "rockettrail")
+    self.Trail:SetParent(self)
+    self.Trail:SetLocalPos(Vector(0, 0, 0))
+    self.Trail:SetLocalAngles(Angle(180, 0, 0))
+    self.Trail:Spawn()
+    self.Trail:Activate()
+    self.Trail:Fire("start", "", 0)
 
     self.RemoveAfter = CurTime() + 20
 end
@@ -57,5 +57,5 @@ function ENT:Explode()
 end
 
 function ENT:OnRemove()
-    self.RocketTrail:Fire("kill", "", 0)
+    if( IsValid(self.Trail) ) then self.Trail:Fire("kill", "", 0) end
 end
