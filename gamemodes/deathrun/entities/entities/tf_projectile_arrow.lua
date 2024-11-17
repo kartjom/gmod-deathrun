@@ -2,13 +2,13 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Base = "base_entity"
 
-ENT.Damage = 25
-
 function ENT:Draw()
 	self:DrawModel()
 end
 
 if (CLIENT) then return end
+
+ENT.Damage = 25
 
 function ENT:Initialize()
 	self:SetModel("models/weapons/w_models/w_arrow.mdl")
