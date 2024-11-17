@@ -6,6 +6,8 @@ local WEAPON_STANDARD_GRENADE = 1
 local WEAPON_STANDARD_ARROW = 2
 local WEAPON_STICKY_GRENADE = 3
 
+ENT.StickyBombs = {}
+
 function ENT:UpdateTransmitState()	
 	return TRANSMIT_NEVER
 end
@@ -25,7 +27,17 @@ function ENT:AcceptInput(inputName, activator, caller, data)
 end
 
 function ENT:DetonateStickies()
-    -- keep track of stickies in a table
+    if (#self.StickyBombs <= 0) then return end
+
+    self:EmitSound("Weapon_StickyBombLauncher.ModeSwitch")
+
+    for k,v in ipairs(self.StickyBombs) do
+        if (IsValid(v)) then
+            v:Explode()
+        end
+    end
+
+    self.StickyBombs = {}
 end
 
 function ENT:FireMultiple(count)
@@ -57,9 +69,6 @@ function ENT:FireRocket()
     ent:Spawn()
 
     self:ApplyOverrides(ent, ent:GetPhysicsObject())
-
-    ent.Damage = self:GetDamage() || ent.Damage
-    ent.SplashRadius = self:GetSplashRadius() || ent.SplashRadius
 end
 
 function ENT:FireGrenade()
@@ -70,9 +79,6 @@ function ENT:FireGrenade()
     self:ApplyOverrides(ent, phys)
 
     phys:AddAngleVelocity(Vector( math.Rand(-500, 500), math.Rand(-500, 500), math.Rand(-500, 500) ))
-
-    ent.Damage = self:GetDamage() || ent.Damage
-    ent.SplashRadius = self:GetSplashRadius() || ent.SplashRadius
 end
 
 function ENT:FireArrow()
@@ -80,12 +86,18 @@ function ENT:FireArrow()
     ent:Spawn()
 
     self:ApplyOverrides(ent, ent)
-
-    ent.Damage = self:GetDamage() || ent.Damage
 end
 
 function ENT:FireStickyGrenade()
-    -- implement
+    local ent = ents.Create( "tf_projectile_pipe_remote" )
+    ent:Spawn()
+    
+    local phys = ent:GetPhysicsObject()
+    self:ApplyOverrides(ent, phys)
+
+    phys:AddAngleVelocity(Vector( math.Rand(-500, 500), math.Rand(-500, 500), math.Rand(-500, 500) ))
+
+    table.insert(self.StickyBombs, ent)
 end
 
 -- Getters
@@ -153,4 +165,7 @@ function ENT:ApplyOverrides(ent, velocityTarget)
 
         velocityTarget:SetVelocity(direction * self:GetSpeed())
     end
+
+    ent.Damage = self:GetDamage() || ent.Damage
+    ent.SplashRadius = self:GetSplashRadius() || ent.SplashRadius
 end
