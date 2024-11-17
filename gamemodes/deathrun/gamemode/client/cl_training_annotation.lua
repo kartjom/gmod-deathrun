@@ -22,7 +22,7 @@ net.Receive("DEATHRUN.ClearAnnotations", function()
     annotations = {}
 end)
 
-local function DrawBoxTrainingAnnotation(text, x, y, width, height)
+local function DrawTrainingAnnotation(text, x, y, width, height)
     local color_blue = Color(88, 133, 162, 255)
     local color_border = Color(247, 231, 198, 255)
     local color_triangle = Color(55, 51, 49, 255)
@@ -76,7 +76,7 @@ end
 hook.Add("HUDPaint", "DEATHRUN.TrainingAnnotation", function()
     for id,v in pairs(annotations) do
         local screen = v.position:ToScreen()
-        DrawBoxTrainingAnnotation(v.text, screen.x, screen.y)
+        DrawTrainingAnnotation(v.text, screen.x, screen.y)
 
         if (v.end_t != -1 && CurTime() >= v.end_t) then
             annotations[id] = nil
