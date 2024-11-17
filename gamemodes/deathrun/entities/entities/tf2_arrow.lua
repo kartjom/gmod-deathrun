@@ -48,7 +48,7 @@ function ENT:Touch(ent)
         self:SetPos(self:GetPos() + self:GetForward())
 
         self:EmitSound("Weapon_Arrow.ImpactConcrete")
-        ParticleEffect("impact_metal", self:GetPos() + self:GetForward() * 7, Angle(), nil)
+        ParticleEffect("impact_metal", self:GetPos(), Angle(), nil)
 
     elseif (ent:IsValid()) then
 
@@ -61,7 +61,7 @@ function ENT:Touch(ent)
         end
 
         ent:EmitSound("Weapon_Arrow.ImpactConcrete")
-        ParticleEffect("impact_metal", self:GetPos() + self:GetForward() * 7, Angle(), nil)
+        ParticleEffect("impact_metal", self:GetPos(), Angle(), nil)
 
         self:Remove()
     end
