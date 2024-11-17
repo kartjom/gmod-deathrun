@@ -21,6 +21,23 @@ function PLAYER:Spawn()
 	
 	self.Player:UnSpectate()
     self.Player:SetPlayerColor( team.GetColor( self.Player:Team() ):ToVector() )
+
+	self.Player:SetParent(NULL)
+    self.Player:SetGravity(0)
+    self.Player:Extinguish()
+	self.Player:GodDisable()
+
+    self.Player:StripWeapons()
+    self.Player:RemoveAllAmmo()
+
+    self.Player:SetNoDraw(false)
+    self.Player:SetColor(Color(255, 255, 255, 255))
+    self.Player:SetCustomCollisionCheck(false)
+    self.Player:SetNoTarget(false)
+    self.Player:AllowFlashlight(true)
+    self.Player:SetCanZoom(true)
+    self.Player:Freeze(false)
+    self.Player:SetMoveType(MOVETYPE_WALK)
 end
 
 function PLAYER:SetModel()
@@ -31,9 +48,6 @@ function PLAYER:SetModel()
 end
 
 function PLAYER:Loadout()
-	self.Player:StripWeapons()
-	self.Player:RemoveAllAmmo()
-
 	self.Player:Give("weapon_crowbar")
     self.Player:SelectWeapon("weapon_crowbar")
 end
