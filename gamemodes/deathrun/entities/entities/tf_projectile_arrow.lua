@@ -15,6 +15,8 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_FLYGRAVITY)
 	self:SetSolid(SOLID_BBOX)
     self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE)
+    self:SetTrigger(true)
+    self:SetNotSolid(true)
 	self:DrawShadow(false)
     self:SetGravity(0.7)
 	
