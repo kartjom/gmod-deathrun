@@ -64,3 +64,11 @@ function util.GetAlivePlayers()
  function string.iequals(a, b)
 	return string.lower(a) == string.lower(b)
  end
+
+function ternary(cond, a, b)
+	if (cond) then
+		return a
+	else
+		return b
+	end
+end
