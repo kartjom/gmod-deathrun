@@ -8,9 +8,9 @@ end
 
 if (CLIENT) then return end
 
-ENT.Damage = 75
+ENT.Damage = 100
 ENT.SplashRadius = 170
-ENT.Velocity = 1000
+ENT.Velocity = 1750
 
 function ENT:Initialize()
     self:SetModel("models/buildables/sentry3_rockets.mdl")

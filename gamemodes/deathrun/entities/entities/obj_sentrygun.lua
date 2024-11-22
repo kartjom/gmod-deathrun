@@ -260,54 +260,53 @@ function ENT:FindTarget()
 	local pTargetCurrent = nil
 	local pTargetOld = self.m_hEnemy
 	local flOldTargetDist2 = math.huge
-	local bDummyTarget = false
 
 	// Don't auto track to targets while under the effects of the player shield.
 	// The shield fades 3 seconds after we disengage from player control.
 	if ( self.m_nShieldLevel == SHIELD_NORMAL ) then return false end
 		
-	if ( !IsValid(pTargetCurrent) ) then
-		// Sentries will try to target players first, then objects.  However, if the enemy held was an object it will continue
-		// to try and attack it first.
+	// Sentries will try to target players first, then objects.  However, if the enemy held was an object it will continue
+	// to try and attack it first.
 
-        local teamPlayers = team.GetPlayers( self:GetEnemyTeamNumber() )
-		local nTeamCount = #teamPlayers
+	local teamPlayers = team.GetPlayers( self:GetEnemyTeamNumber() )
+	local nTeamCount = #teamPlayers
 
-		for _, pTargetPlayer in ipairs(teamPlayers) do
-			if ( !IsValid(pTargetPlayer) ) then continue end
+	for _, pTargetPlayer in ipairs(teamPlayers) do
+		if ( !IsValid(pTargetPlayer) ) then continue end
 
-			// Make sure the player is alive.
-			if ( !pTargetPlayer:Alive() ) then continue end
+		// Make sure the player is alive.
+		if ( !pTargetPlayer:Alive() ) then continue end
 
-			if ( pTargetPlayer:IsFlagSet(FL_NOTARGET) ) then continue end
+		if ( pTargetPlayer:IsFlagSet(FL_NOTARGET) ) then continue end
 
-			vecTargetCenter = pTargetPlayer:GetPos()
-			vecTargetCenter = vecTargetCenter + pTargetPlayer:GetViewOffset()
-            vecSegment = vecTargetCenter - vecSentryOrigin
-			local flDist2 = vecSegment:LengthSqr()
+		vecTargetCenter = pTargetPlayer:GetPos()
+		vecTargetCenter = vecTargetCenter + pTargetPlayer:GetViewOffset()
+		vecSegment = vecTargetCenter - vecSentryOrigin
+		local flDist2 = vecSegment:LengthSqr()
 
-			// Check to see if the target is closer than the already validated target.
-			if ( flDist2 > flMinDist2 ) then continue end
+		// Check to see if the target is closer than the already validated target.
+		if ( flDist2 > flMinDist2 ) then continue end
 
-            flMinDist2 = flDist2
-            pTargetCurrent = pTargetPlayer
+		// Check if player is not behind walls or props
+		if ( !self:IsTargetVisible(pTargetPlayer) ) then continue end
 
-            // Store the current target distance if we come across it
-            if ( pTargetPlayer == pTargetOld ) then
-                flOldTargetDist2 = flDist2
-            end
+		flMinDist2 = flDist2
+		pTargetCurrent = pTargetPlayer
+
+		// Store the current target distance if we come across it
+		if ( pTargetPlayer == pTargetOld ) then
+			flOldTargetDist2 = flDist2
 		end
 	end
 
 	// We have a target.
-	if ( IsValid(pTargetCurrent) ) then
+	if ( IsValid(pTargetCurrent) && self:IsTargetVisible(pTargetCurrent) ) then
 		if ( pTargetCurrent != pTargetOld ) then
-			// Always target dummies
 			// flMinDist2 is the new target's distance
 			// flOldTargetDist2 is the old target's distance
 			// Don't switch unless the new target is closer by some percentage
-			if ( bDummyTarget || flMinDist2 < ( flOldTargetDist2 * 0.75 ) ) then
-				self:FoundTarget( pTargetCurrent, vecSentryOrigin, false )
+			if ( flMinDist2 < (flOldTargetDist2 * 0.75) ) then
+				self:FoundTarget(pTargetCurrent, vecSentryOrigin, false)
             end
 		end
 
@@ -347,6 +346,28 @@ function ENT:FoundTarget( pTarget, vecSoundCenter, bNoSound )
 	if ( self.m_flNextRocketAttack < CurTime() ) then
 		self.m_flNextRocketAttack = CurTime() // + 0.5
     end
+end
+
+function ENT:IsTargetVisible(target)
+	if ( !IsValid(target) ) then return end
+	if ( !target:IsPlayer() ) then return end
+	if ( !target:Alive() ) then return end
+
+	local vecSrc = self:GetFiringPos()
+	local vecEnemyPos = self:GetEnemyAimPosition(target)
+	local vecAimDir = vecEnemyPos - vecSrc
+	vecAimDir:Normalize()
+
+	local tr_data = {
+		start = vecSrc,
+		endpos = vecEnemyPos,
+		filter = self,
+		collisiongroup = COLLISION_GROUP_NONE,
+		mask = MASK_SOLID,
+	}
+	local tr = util.TraceLine(tr_data)
+
+	return tr.Entity == target
 end
 
 function ENT:Attack()
@@ -578,12 +599,13 @@ end
 function ENT:GetEnemyAimPosition( pEnemy )
 	// Default to pointing to the origin
 	local vecPos = pEnemy:GetPos()
+	local bone = nil
 
-	local iSpineBone = pEnemy:LookupBone("ValveBiped.Bip01_Spine2")
-    if (iSpineBone != nil) then
-        local pos = pEnemy:GetBonePosition(iSpineBone)
-        return pos
-    end
+	bone = pEnemy:LookupBone("ValveBiped.Bip01_Neck1")
+    if (bone != nil) then return pEnemy:GetBonePosition(bone) end
+
+	bone = pEnemy:LookupBone("ValveBiped.Bip01_Spine2")
+    if (bone != nil) then return pEnemy:GetBonePosition(bone) end
 
 	return vecPos
 end
@@ -759,7 +781,7 @@ function ENT:StartUpgrading()
     if (self.m_iUpgradeLevel == 3) then
         self:SetSentryModel(SENTRY_MODEL_LEVEL_3)
 
-		if (!self.m_bCarryDeploy) then
+		if ( !self.m_bCarryDeploy ) then
 			self.m_iAmmoRockets = SENTRYGUN_MAX_ROCKETS
         end
 
@@ -768,7 +790,7 @@ function ENT:StartUpgrading()
     end
 
 	// more ammo capability
-	if (!self.m_bCarryDeploy) then
+	if ( !self.m_bCarryDeploy ) then
 		self.m_iAmmoShells = self.m_iMaxAmmoShells
     end
 
@@ -808,15 +830,15 @@ end
 
 function ENT:GetSentryAttachment(att)
 	if (self.m_iUpgradeLevel == 1) then
-        if (att == SENTRYGUN_ATTACHMENT_MUZZLE) then return self:LookupAttachment("muzzle") end
+        if (att == SENTRYGUN_ATTACHMENT_MUZZLE) then return self:LookupAttachment( "muzzle" ) end
         if (att == SENTRYGUN_ATTACHMENT_MUZZLE_ALT) then return 0 end
         if (att == SENTRYGUN_ATTACHMENT_ROCKET) then return 0 end
     end
 
 	if (self.m_iUpgradeLevel >= 2) then
-        if (att == SENTRYGUN_ATTACHMENT_MUZZLE) then return self:LookupAttachment("muzzle_l") end
-        if (att == SENTRYGUN_ATTACHMENT_MUZZLE_ALT) then return self:LookupAttachment("muzzle_r") end
-        if (att == SENTRYGUN_ATTACHMENT_ROCKET) then return self:LookupAttachment("rocket_l") end
+        if (att == SENTRYGUN_ATTACHMENT_MUZZLE) then return self:LookupAttachment( "muzzle_l" ) end
+        if (att == SENTRYGUN_ATTACHMENT_MUZZLE_ALT) then return self:LookupAttachment( "muzzle_r" ) end
+        if (att == SENTRYGUN_ATTACHMENT_ROCKET) then return self:LookupAttachment( "rocket_l" ) end
     end
 
 	return 0
