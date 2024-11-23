@@ -465,7 +465,7 @@ function ENT:FireRocket()
 		self:AddGesture(ACT_RANGE_ATTACK2)
 		self.m_flNextRocketAttack = CurTime() + 3
 
-		if (true) then -- !HasSpawnFlags( SF_SENTRY_INFINITE_AMMO )
+		if ( !self:HasInfiniteAmmo() ) then
 			self.m_iAmmoRockets = self.m_iAmmoRockets - 1
 		end
 	end
@@ -477,12 +477,12 @@ function ENT:SentryFire()
 	local vecAimDir = Vector()
 
 	// Level 3 Turrets fire rockets every 3 seconds
-	if ( self.m_iUpgradeLevel == 3 && self.m_iAmmoRockets > 0 && self.m_flNextRocketAttack < CurTime() ) then
+	if ( self.m_iUpgradeLevel == 3 && (self.m_iAmmoRockets > 0 || self:HasInfiniteAmmo()) && self.m_flNextRocketAttack < CurTime() ) then
 		self:FireRocket()
     end
 
 	// All turrets fire shells
-	if ( self.m_iAmmoShells > 0 ) then
+	if ( self.m_iAmmoShells > 0 || self:HasInfiniteAmmo() ) then
 		if ( !self:IsPlayingGesture( ACT_RANGE_ATTACK1 ) ) then
 			self:RemoveGesture( ACT_RANGE_ATTACK1_LOW )
 			self:AddGesture( ACT_RANGE_ATTACK1 )
@@ -552,7 +552,7 @@ function ENT:SentryFire()
 			if (self.m_iUpgradeLevel == 3) then self:EmitSound( "Building_Sentrygun.Fire3" ) end
 		end
 
-		if ( true ) then -- !HasSpawnFlags( SF_SENTRY_INFINITE_AMMO )
+		if ( !self:HasInfiniteAmmo() ) then
 			self.m_iAmmoShells = self.m_iAmmoShells - 1
         end
 	else
@@ -833,8 +833,10 @@ end
 function ENT:OnTakeDamage(dmginfo)
 	self:TriggerOutput("OnDamaged", dmginfo:GetAttacker())
 	
-	self:SetSentryHealth( self:Health() - dmginfo:GetDamage() )
-	if ( self:Health() <= 0 ) then self:DetonateObject() end
+	if ( !self:IsInvulnerable() ) then
+		self:SetSentryHealth( self:Health() - dmginfo:GetDamage() )
+		if ( self:Health() <= 0 ) then self:DetonateObject() end
+	end
 end
 
 function ENT:DetonateObject()
@@ -843,6 +845,20 @@ function ENT:DetonateObject()
 	
 	print("DetonateObject()")
 end
+
+-- Flags
+function ENT:IsInvulnerable()
+	return self:HasSpawnFlags(2)
+end
+
+function ENT:IsUpgradable()
+	return self:HasSpawnFlags(4)
+end
+
+function ENT:HasInfiniteAmmo()
+	return self:HasSpawnFlags(8)
+end
+-- Flags End
 
 -- Inputs
 function ENT:Input_SetHealth(data)
