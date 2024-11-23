@@ -841,6 +841,13 @@ end
 
 function ENT:DetonateObject()
 	self:TriggerOutput("OnDestroyed", self)
+
+	self:EmitSound("Building_Sentry.Explode")
+    ParticleEffect("ExplosionCore_MidAir", self:GetPos(), Angle())
+
+	self:PrecacheGibs()
+	self:GibBreakServer(Vector(math.random(-100, 100), math.random(-100, 100), math.random(100, 150)))
+
 	self:Remove()
 	
 	print("DetonateObject()")
