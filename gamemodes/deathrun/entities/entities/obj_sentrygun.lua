@@ -28,9 +28,9 @@ local SENTRYGUN_MAX_HEALTH = 150
 local SENTRYGUN_MINI_MAX_HEALTH	= 100
 local UPGRADE_LEVEL_HEALTH_MULTIPLIER = 1.2
 
-local SENTRYGUN_EYE_OFFSET_LEVEL_1 = Vector( 0, 0, 32 )
-local SENTRYGUN_EYE_OFFSET_LEVEL_2 = Vector( 0, 0, 40 )
-local SENTRYGUN_EYE_OFFSET_LEVEL_3 = Vector( 0, 0, 46 )
+local SENTRYGUN_EYE_OFFSET_LEVEL_1 = Vector(0, 0, 32)
+local SENTRYGUN_EYE_OFFSET_LEVEL_2 = Vector(0, 0, 40)
+local SENTRYGUN_EYE_OFFSET_LEVEL_3 = Vector(0, 0, 46)
 
 local VIEW_FIELD_FULL = -1.0 			// +-180 degrees
 local VIEW_FIELD_WIDE = -0.7 			// +-135 degrees 0.1 // +-85 degrees, used for full FOV checks 
@@ -62,23 +62,39 @@ local SHIELD_NONE = 0
 local SHIELD_NORMAL = 1
 local SHIELD_MAX = 2
 
+function ENT:KeyValue(key, value)
+    if (string.StartsWith(key, "On")) then
+		self:StoreOutput(key, value)
+	else
+        self:StoreValue(key, value)
+    end
+end
+
+function ENT:AcceptInput(inputName, activator, caller, data)
+    if (string.iequals(inputName, "SetHealth")) then self:Input_SetHealth(data) end
+    if (string.iequals(inputName, "AddHealth")) then self:Input_AddHealth(data) end
+    if (string.iequals(inputName, "RemoveHealth")) then self:Input_RemoveHealth(data) end
+    if (string.iequals(inputName, "SetSolidToPlayer")) then self:Input_SetSolidToPlayer(data) end
+    if (string.iequals(inputName, "SetTeam")) then self:Input_SetTeam(data) end
+    if (string.iequals(inputName, "Skin")) then self:Input_Skin(data) end
+    if (string.iequals(inputName, "SetBuilder")) then self:Input_SetBuilder(activator) end
+    if (string.iequals(inputName, "Show")) then /* method */ end
+    if (string.iequals(inputName, "Hide")) then /* method */ end
+    if (string.iequals(inputName, "Enable")) then /* method */ end
+    if (string.iequals(inputName, "Disable")) then /* method */ end
+end
+
 function ENT:SetupMemberVariables()
     self.m_iTeamNumber = 0 -- expose this
     
 	self.m_nDefaultUpgradeLevel = 0 -- expose this
     self.m_iHighestUpgradeLevel = 3
-
-    self.m_bWasMapPlaced = false -- expose this
 	
-    self.m_flUpgradeCompleteTime = 0
-
     self.m_vecCurAngles = Vector()
     self.m_vecGoalAngles = Vector()
 
     self.m_flTurnRate = 0
     self.m_bTurningRight = false
-    self.m_bCarryDeploy = false
-    self.m_flUpgradeDuration = 10
 
     self.m_flNextAttack = 0
     self.m_flNextRocketAttack = 0
@@ -93,16 +109,10 @@ function ENT:Constructor()
 	self:SetMaxHealth(iHealth)
 	self:SetHealth(iHealth)
 
-	self.m_bFireNextFrame = false
-	self.m_bFireRocketNextFrame = false
-	self.m_flAutoAimStartTime = 0
-	self.m_bPlayerControlled = false
-	self.m_iLifetimeShieldedDamage = 0
 	self.m_flFireRate = 1
 	self.m_flSentryRange = SENTRY_MAX_RANGE
 	self.m_nShieldLevel = SHIELD_NONE
-	self.m_lastTeammateWrenchHit = nil
-	self.m_flScaledSentry = 1
+	self.m_flScaledSentry = 1 -- mini sentry is just scaled down normal sentry with light bodygroup on top
 end
 
 function ENT:Initialize()
@@ -130,15 +140,11 @@ function ENT:Initialize()
 
 	self.m_flHeavyBulletResist = SENTRYGUN_MINIGUN_RESIST_LVL_1
 
-	self.m_lastTeammateWrenchHit = nil
-
 	self.m_iUpgradeLevel = 1
 	self.m_iUpgradeMetalRequired = 100 -- change this
 
 	self:SetSentryModel(SENTRY_MODEL_PLACEMENT)
-
 	self.m_iState = SENTRY_STATE_INACTIVE
-
 	-- Spawn() end
 
 	self:OnGoActive() -- triggered by input
@@ -173,16 +179,11 @@ function ENT:OnGoActive()
 
 	self:EmitSound("Building_Sentrygun.Built")
 
-	if (self.m_bCarryDeploy) then
-		self.m_iAmmoShells = self.m_iOldAmmoShells
-		self.m_iAmmoRockets = self.m_iOldAmmoRockets
-	else
-		self.m_iAmmoShells = self.m_iMaxAmmoShells
-		self.m_iAmmoRockets = self.m_iMaxAmmoRockets
-	end
+	self.m_iAmmoShells = self.m_iMaxAmmoShells
+	self.m_iAmmoRockets = self.m_iMaxAmmoRockets
 
 	while (self.m_nDefaultUpgradeLevel + 1 > self.m_iUpgradeLevel) do
-		self:StartUpgrading()
+		self:Upgrade()
 	end
 
 	// Switch to the on state
@@ -245,8 +246,6 @@ function ENT:SentryRotate()
 end
 
 function ENT:FindTarget()
-	self.m_bPlayerControlled = false
-
 	// Sapper, etc.
 	if ( self:IsDisabled() ) then return false end
 
@@ -410,18 +409,9 @@ function ENT:Attack()
 
     // Fire on the target if it's within 10 units of being aimed right at it
 	if ( self.m_flNextAttack <= CurTime() && (self.m_vecGoalAngles - self.m_vecCurAngles):Length() <= 10 ) then
-		if ( !self.m_bPlayerControlled || m_bFireNextFrame ) then
-			self.m_bFireNextFrame = false
-			self:SentryFire()
-        end
+		self:SentryFire()
 
-		self.m_flFireRate = 1
-		--CALL_ATTRIB_HOOK_FLOAT_ON_OTHER( GetOwner(), m_flFireRate, mult_sentry_firerate )
-
-		if ( self.m_bPlayerControlled ) then
-			self.m_flFireRate = self.m_flFireRate * 0.5
-        end
-			
+		self.m_flFireRate = 1		
 		if ( self:IsMiniBuilding() && !self:IsDisposableBuilding() ) then
 			self.m_flFireRate = self.m_flFireRate * 0.75
         end
@@ -458,7 +448,7 @@ function ENT:FireRocket()
 	}
 	local tr = util.TraceLine(tr_data)
 
-	if ( self.m_bPlayerControlled || ( IsValid(tr.Entity) && !tr.Entity:IsWorld() ) ) then
+	if ( IsValid(tr.Entity) && !tr.Entity:IsWorld() ) then
 		self:EmitSound( "Building_Sentrygun.FireRocket" )
 
 		local angAimDir = vecAimDir:Angle()
@@ -471,12 +461,8 @@ function ENT:FireRocket()
 		pProjectile.Damage = 100
 
 		// Setup next rocket shot
-		if ( self.m_bPlayerControlled ) then
-			self.m_flNextRocketAttack = CurTime() + 2.25
-		else
-			self:AddGesture(ACT_RANGE_ATTACK2)
-			self.m_flNextRocketAttack = CurTime() + 3
-		end
+		self:AddGesture(ACT_RANGE_ATTACK2)
+		self.m_flNextRocketAttack = CurTime() + 3
 
 		if (true) then -- !HasSpawnFlags( SF_SENTRY_INFINITE_AMMO )
 			self.m_iAmmoRockets = self.m_iAmmoRockets - 1
@@ -490,7 +476,7 @@ function ENT:SentryFire()
 	local vecAimDir = Vector()
 
 	// Level 3 Turrets fire rockets every 3 seconds
-	if ( self.m_iUpgradeLevel == 3 && self.m_iAmmoRockets > 0 && self.m_flNextRocketAttack < CurTime() && !self.m_bPlayerControlled ) then
+	if ( self.m_iUpgradeLevel == 3 && self.m_iAmmoRockets > 0 && self.m_flNextRocketAttack < CurTime() ) then
 		self:FireRocket()
     end
 
@@ -560,15 +546,9 @@ function ENT:SentryFire()
 		if ( self:IsMiniBuilding() ) then
 			self:EmitSound( "Building_MiniSentrygun.Fire" )
 		else
-			if ( !self.m_bPlayerControlled ) then
-                if (self.m_iUpgradeLevel == 1) then self:EmitSound( "Building_Sentrygun.Fire" ) end
-                if (self.m_iUpgradeLevel == 2) then self:EmitSound( "Building_Sentrygun.Fire2" ) end
-                if (self.m_iUpgradeLevel == 3) then self:EmitSound( "Building_Sentrygun.Fire3" ) end
-			else
-                if (self.m_iUpgradeLevel == 1) then self:EmitSound( "Building_Sentrygun.ShaftFire" ) end
-                if (self.m_iUpgradeLevel == 2) then self:EmitSound( "Building_Sentrygun.ShaftFire2" ) end
-                if (self.m_iUpgradeLevel == 3) then self:EmitSound( "Building_Sentrygun.ShaftFire3" ) end
-            end
+			if (self.m_iUpgradeLevel == 1) then self:EmitSound( "Building_Sentrygun.Fire" ) end
+			if (self.m_iUpgradeLevel == 2) then self:EmitSound( "Building_Sentrygun.Fire2" ) end
+			if (self.m_iUpgradeLevel == 3) then self:EmitSound( "Building_Sentrygun.Fire3" ) end
 		end
 
 		if ( true ) then -- !HasSpawnFlags( SF_SENTRY_INFINITE_AMMO )
@@ -711,19 +691,15 @@ function ENT:MoveTurret()
 end
 
 function ENT:GetBaseTurnRate()
-	if ( self.m_bPlayerControlled ) then
+	if (self.m_iState == SENTRY_STATE_SEARCHING) then
+		return self.m_iBaseTurnRate * 40
+	end
+
+	if (self.m_iState == SENTRY_STATE_ATTACKING) then
 		return self.m_iBaseTurnRate * 100
-	else   
-        if (self.m_iState == SENTRY_STATE_SEARCHING) then
-		    return self.m_iBaseTurnRate * 40
-        end
+	end
 
-        if (self.m_iState == SENTRY_STATE_ATTACKING) then
-		    return self.m_iBaseTurnRate * 100
-        end
-
-        return self.m_iBaseTurnRate
-    end
+	return self.m_iBaseTurnRate
 end
 
 function ENT:GetFireAttachment()
@@ -740,7 +716,7 @@ function ENT:GetFireAttachment()
 	return iAttachment
 end
 
-function ENT:StartUpgrading()
+function ENT:Upgrade()
 	// Increase level
 	self.m_iUpgradeLevel = self.m_iUpgradeLevel + 1
 
@@ -749,27 +725,14 @@ function ENT:StartUpgrading()
     end
 
 	// more health
-	if (!self.m_bCarryDeploy) then
-        local iMaxHealth = ternary(self:IsMiniBuilding(), SENTRYGUN_MINI_MAX_HEALTH, SENTRYGUN_MAX_HEALTH)
-		local flMultiplier = math.pow( UPGRADE_LEVEL_HEALTH_MULTIPLIER, self.m_iUpgradeLevel - 1 )
-		iMaxHealth = iMaxHealth * flMultiplier
+	local iMaxHealth = ternary(self:IsMiniBuilding(), SENTRYGUN_MINI_MAX_HEALTH, SENTRYGUN_MAX_HEALTH)
+	local flMultiplier = math.pow( UPGRADE_LEVEL_HEALTH_MULTIPLIER, self.m_iUpgradeLevel - 1 )
+	iMaxHealth = iMaxHealth * flMultiplier
 
-		self:SetMaxHealth(iMaxHealth)
-		self:SetHealth(iMaxHealth)
-    end
+	self:SetMaxHealth(iMaxHealth)
+	self:SetHealth(iMaxHealth)
 
     self:EmitSound("Building_Sentrygun.Built")
-
-	if ( ( !self.m_bWasMapPlaced || ( self.m_iUpgradeLevel > (self.m_nDefaultUpgradeLevel + 1) ) ) ) then
-		local flConstructionTime = ( self.m_flUpgradeDuration )
-		local flReverseBuildingConstructionSpeed = 0 -- GetReversesBuildingConstructionSpeed()
-		flConstructionTime = flConstructionTime / ( ternary(flReverseBuildingConstructionSpeed == 0, 1.0, flReverseBuildingConstructionSpeed) )
-
-		self.m_flUpgradeCompleteTime = CurTime() + flConstructionTime
-	else
-		self.m_flUpgradeCompleteTime = CurTime()	//asap
-    end
-
 	self:RemoveAllGestures()
 
     if (self.m_iUpgradeLevel == 2) then
@@ -780,19 +743,13 @@ function ENT:StartUpgrading()
 
     if (self.m_iUpgradeLevel == 3) then
         self:SetSentryModel(SENTRY_MODEL_LEVEL_3)
-
-		if ( !self.m_bCarryDeploy ) then
-			self.m_iAmmoRockets = SENTRYGUN_MAX_ROCKETS
-        end
-
 		self.m_flHeavyBulletResist = SENTRYGUN_MINIGUN_RESIST_LVL_3
 		self.m_iMaxAmmoShells = SENTRYGUN_MAX_SHELLS_3
+		self.m_iAmmoRockets = SENTRYGUN_MAX_ROCKETS
     end
 
 	// more ammo capability
-	if ( !self.m_bCarryDeploy ) then
-		self.m_iAmmoShells = self.m_iMaxAmmoShells
-    end
+	self.m_iAmmoShells = self.m_iMaxAmmoShells
 
 	self.m_iState = SENTRY_STATE_SEARCHING
 	self.m_hEnemy = nil
@@ -817,11 +774,6 @@ end
 
 function ENT:GetEnemyTeamNumber()
 	return ternary(self.m_iTeamNumber == TF_TEAM_RED, TF_TEAM_BLUE, TF_TEAM_RED)
-end
-
-function ENT:DetonateObject()
-    print("DetonateObject()")
-    self:Remove()
 end
 
 function ENT:GetFiringPos()
@@ -871,3 +823,54 @@ function ENT:SetSentryModel(pModel)
 	self:SetPoseParameter(self.m_iPitchPoseParameter, flPoseParam0)
 	self:SetPoseParameter(self.m_iYawPoseParameter, flPoseParam1)
 end
+
+function ENT:OnTakeDamage(dmginfo)
+	self:SetHealth( self:Health() - dmginfo:GetDamage() )
+
+	if ( self:Health() <= 0 ) then self:DetonateObject() end
+
+	Entity(1):ChatPrint(self:Health())
+end
+
+function ENT:DetonateObject()
+	print("DetonateObject()")
+
+	self:Remove()
+end
+
+-- Inputs
+function ENT:Input_SetHealth(data)
+	self:SetHealth(tonumber(data))
+	self:SetMaxHealth(tonumber(data))
+end
+
+function ENT:Input_AddHealth(data)
+	local newHealth = self:Health() + tonumber(data)
+	self:SetHealth( math.Clamp(newHealth, 0, self:GetMaxHealth()) )
+end
+
+function ENT:Input_RemoveHealth(data)
+	local newHealth = self:Health() - tonumber(data)
+	self:SetHealth(newHealth)
+
+	if (newHealth <= 0) then self:DetonateObject() end
+end
+
+function ENT:Input_SetSolidToPlayer(data)
+	local shouldBeSolid = tobool(data)
+	self:SetCollisionGroup( ternary(shouldBeSolid, COLLISION_GROUP_NONE, COLLISION_GROUP_PASSABLE_DOOR) )
+end
+
+function ENT:Input_SetTeam(data)
+	self.m_iTeamNumber = tonumber(data)
+end
+
+function ENT:Input_Skin(data)
+	self:SetSkin( tonumber(data) )
+end
+
+function ENT:Input_SetBuilder(activator)
+	self:SetOwner(activator)
+end
+
+-- Inputs End
