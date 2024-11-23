@@ -78,19 +78,23 @@ function ENT:AcceptInput(inputName, activator, caller, data)
     if (string.iequals(inputName, "SetTeam")) then self:Input_SetTeam(data) end
     if (string.iequals(inputName, "Skin")) then self:Input_Skin(data) end
     if (string.iequals(inputName, "SetBuilder")) then self:Input_SetBuilder(activator) end
-    if (string.iequals(inputName, "Show")) then /* method */ end
-    if (string.iequals(inputName, "Hide")) then /* method */ end
-    if (string.iequals(inputName, "Enable")) then /* method */ end
-    if (string.iequals(inputName, "Disable")) then /* method */ end
+    if (string.iequals(inputName, "Show")) then self:Input_Show() end
+    if (string.iequals(inputName, "Hide")) then self:Input_Hide() end
+    if (string.iequals(inputName, "Enable")) then self:Input_Enable() end
+    if (string.iequals(inputName, "Disable")) then self:Input_Disable() end
 end
 
-function ENT:SetupMemberVariables()
-    self.m_iTeamNumber = 0 -- expose this
-    
-	self.m_nDefaultUpgradeLevel = 0 -- expose this
-    self.m_iHighestUpgradeLevel = 3
-	
-    self.m_vecCurAngles = Vector()
+function ENT:Constructor()
+	local iHealth = ternary(self:IsMiniBuilding(), SENTRYGUN_MINI_MAX_HEALTH, SENTRYGUN_MAX_HEALTH)
+	self:SetMaxHealth(iHealth)
+	self:SetHealth(iHealth)
+
+	self.m_flFireRate = 1
+	self.m_flSentryRange = SENTRY_MAX_RANGE
+	self.m_nShieldLevel = SHIELD_NONE
+	self.m_flScaledSentry = 1 -- mini sentry is just scaled down normal sentry with light bodygroup on top
+
+	self.m_vecCurAngles = Vector()
     self.m_vecGoalAngles = Vector()
 
     self.m_flTurnRate = 0
@@ -102,21 +106,15 @@ function ENT:SetupMemberVariables()
     self.m_iLastMuzzleAttachmentFired = 0
 end
 
-function ENT:Constructor()
-	self:SetupMemberVariables()
-
-	local iHealth = ternary(self:IsMiniBuilding(), SENTRYGUN_MINI_MAX_HEALTH, SENTRYGUN_MAX_HEALTH)
-	self:SetMaxHealth(iHealth)
-	self:SetHealth(iHealth)
-
-	self.m_flFireRate = 1
-	self.m_flSentryRange = SENTRY_MAX_RANGE
-	self.m_nShieldLevel = SHIELD_NONE
-	self.m_flScaledSentry = 1 -- mini sentry is just scaled down normal sentry with light bodygroup on top
-end
-
 function ENT:Initialize()
 	self:Constructor()
+
+	self.Enabled = true
+
+	self.m_iUpgradeLevel = 0
+	self.m_iTeamNumber = self:GetStoredValue("TeamNum", "int", 2) -- 2: Red, 3: Blue
+	self.m_nDefaultUpgradeLevel = self:GetStoredValue("defaultupgrade", "int", 0) -- 0, 1, 2
+    self.m_iHighestUpgradeLevel = 3
 
 	-- Spawn()
 	self.m_iPitchPoseParameter = -1
@@ -140,10 +138,11 @@ function ENT:Initialize()
 
 	self.m_flHeavyBulletResist = SENTRYGUN_MINIGUN_RESIST_LVL_1
 
-	self.m_iUpgradeLevel = 1
-	self.m_iUpgradeMetalRequired = 100 -- change this
-
 	self:SetSentryModel(SENTRY_MODEL_PLACEMENT)
+
+	local shouldBeSolid = self:GetStoredValue("SolidToPlayer", "bool", true)
+	self:SetCollisionGroup( ternary(shouldBeSolid, COLLISION_GROUP_NONE, COLLISION_GROUP_PASSABLE_DOOR) )
+
 	self.m_iState = SENTRY_STATE_INACTIVE
 	-- Spawn() end
 
@@ -194,6 +193,8 @@ function ENT:OnGoActive()
 end
 
 function ENT:Think()
+	if (!self.Enabled) then return end
+
     if (self.m_iState == SENTRY_STATE_SEARCHING) then self:SentryRotate() end
     if (self.m_iState == SENTRY_STATE_ATTACKING) then self:Attack() end
 
@@ -873,4 +874,21 @@ function ENT:Input_SetBuilder(activator)
 	self:SetOwner(activator)
 end
 
+function ENT:Input_Show()
+	self.Enabled = true
+	self:SetNoDraw(false)
+end
+
+function ENT:Input_Hide()
+	self.Enabled = false
+	self:SetNoDraw(true)
+end
+
+function ENT:Input_Enable()
+	self.Enabled = true
+end
+
+function ENT:Input_Disable()
+	self.Enabled = false
+end
 -- Inputs End
