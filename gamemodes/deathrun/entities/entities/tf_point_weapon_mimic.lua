@@ -1,5 +1,12 @@
+AddCSLuaFile()
 ENT.Base = "base_entity"
 ENT.Type = "point"
+
+if (CLIENT) then
+    language.Add("tf_point_weapon_mimic", "World")
+end
+
+if (CLIENT) then return end
 
 local WEAPON_STANDARD_ROCKET = 0
 local WEAPON_STANDARD_GRENADE = 1

@@ -7,6 +7,10 @@ function ENT:Draw()
     self:DrawModel()
 end
 
+if (CLIENT) then
+    language.Add("obj_sentrygun", "Sentry")
+end
+
 if (CLIENT) then return end
 
 local SENTRY_MODEL_PLACEMENT = "models/buildables/sentry1_blueprint.mdl"

@@ -6,6 +6,10 @@ function ENT:Draw()
     self:DrawModel()
 end
 
+if (CLIENT) then
+    language.Add("tf_projectile_rocket", "Rocket")
+end
+
 if (CLIENT) then return end
 
 ENT.Damage = 75
