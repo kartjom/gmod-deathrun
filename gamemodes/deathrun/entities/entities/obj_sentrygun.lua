@@ -1,6 +1,7 @@
 AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Base = "base_entity"
+ENT.AutomaticFrameAdvance = true
 
 function ENT:Draw()
     self:DrawModel()
@@ -88,7 +89,7 @@ function ENT:Initialize()
 	self.Enabled = true
 
 	self.m_iUpgradeLevel = 0
-	self.m_iTeamNumber = self:GetStoredValue("TeamNum", "int", 2) -- 2: Red, 3: Blue
+	self.m_iTeamNumber = self:GetStoredValue("TeamNum", "int", 3) -- 2: Red, 3: Blue
 	self.m_nDefaultUpgradeLevel = self:GetStoredValue("defaultupgrade", "int", 0) -- 0, 1, 2
     self.m_iHighestUpgradeLevel = 3
 

@@ -16,7 +16,7 @@ end
 
 function ent:GetStoredValue(key, desiredType, default)
     if (self.KeyValues == nil) then
-        return nil
+        return default
     end
 
     local val = self.KeyValues[string.lower(key)]

@@ -168,4 +168,5 @@ function ENT:ApplyOverrides(ent, velocityTarget)
 
     ent.Damage = self:GetDamage() || ent.Damage
     ent.SplashRadius = self:GetSplashRadius() || ent.SplashRadius
+    ent.Velocity = self:GetSpeed()
 end

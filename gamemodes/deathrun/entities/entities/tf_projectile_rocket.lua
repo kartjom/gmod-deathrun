@@ -10,6 +10,7 @@ if (CLIENT) then return end
 
 ENT.Damage = 75
 ENT.SplashRadius = 170
+ENT.Velocity = 1100
 
 function ENT:Initialize()
     self:SetModel("models/weapons/w_models/w_rocket.mdl")
@@ -37,6 +38,8 @@ function ENT:Think()
     if (CurTime() >= self.RemoveAfter) then return self:Remove() end
     if (self.Hit == true) then return self:Explode() end
 
+    self:GetPhysicsObject():SetVelocity(self:GetForward() * self.Velocity)
+
     self:NextThink(CurTime())
     return true
 end
@@ -51,7 +54,8 @@ function ENT:Explode()
     explode:Spawn()
     explode:Fire("Explode", 0, 0)
 
-    util.BlastDamage(self, self:GetOwner(), self:GetPos(), self.SplashRadius, self.Damage)
+    local attacker = IsValid(self:GetOwner()) and self:GetOwner() or self
+    util.BlastDamage(self, attacker, self:GetPos(), self.SplashRadius, self.Damage)
     
     self:Remove()
 end
