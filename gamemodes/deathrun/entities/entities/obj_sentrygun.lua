@@ -136,7 +136,7 @@ function ENT:Initialize()
 
 	local iHealth = ternary(self:IsMiniBuilding(), SENTRYGUN_MINI_MAX_HEALTH, SENTRYGUN_MAX_HEALTH)
 	self:SetMaxHealth(iHealth)
-	self:SetHealth(iHealth)
+	self:SetSentryHealth(iHealth)
 	
 	self:SetSentryModel(SENTRY_MODEL_PLACEMENT)
 
@@ -731,7 +731,7 @@ function ENT:Upgrade()
 	iMaxHealth = iMaxHealth * flMultiplier
 
 	self:SetMaxHealth(iMaxHealth)
-	self:SetHealth(iMaxHealth)
+	self:SetSentryHealth(iMaxHealth)
 
     self:EmitSound("Building_Sentrygun.Built")
 	self:RemoveAllGestures()
@@ -825,34 +825,39 @@ function ENT:SetSentryModel(pModel)
 	self:SetPoseParameter(self.m_iYawPoseParameter, flPoseParam1)
 end
 
+function ENT:SetSentryHealth(value)
+	self:TriggerOutput("OnObjectHealthChanged", self, value)
+	self:SetHealth(value)
+end
+
 function ENT:OnTakeDamage(dmginfo)
-	self:SetHealth( self:Health() - dmginfo:GetDamage() )
-
+	self:TriggerOutput("OnDamaged", dmginfo:GetAttacker())
+	
+	self:SetSentryHealth( self:Health() - dmginfo:GetDamage() )
 	if ( self:Health() <= 0 ) then self:DetonateObject() end
-
-	Entity(1):ChatPrint(self:Health())
 end
 
 function ENT:DetonateObject()
-	print("DetonateObject()")
-
+	self:TriggerOutput("OnDestroyed", self)
 	self:Remove()
+	
+	print("DetonateObject()")
 end
 
 -- Inputs
 function ENT:Input_SetHealth(data)
-	self:SetHealth(tonumber(data))
+	self:SetSentryHealth(tonumber(data))
 	self:SetMaxHealth(tonumber(data))
 end
 
 function ENT:Input_AddHealth(data)
 	local newHealth = self:Health() + tonumber(data)
-	self:SetHealth( math.Clamp(newHealth, 0, self:GetMaxHealth()) )
+	self:SetSentryHealth( math.Clamp(newHealth, 0, self:GetMaxHealth()) )
 end
 
 function ENT:Input_RemoveHealth(data)
 	local newHealth = self:Health() - tonumber(data)
-	self:SetHealth(newHealth)
+	self:SetSentryHealth(newHealth)
 
 	if (newHealth <= 0) then self:DetonateObject() end
 end
@@ -875,20 +880,24 @@ function ENT:Input_SetBuilder(activator)
 end
 
 function ENT:Input_Show()
+	self:TriggerOutput("OnReenabled", self)
 	self.Enabled = true
 	self:SetNoDraw(false)
 end
 
 function ENT:Input_Hide()
+	self:TriggerOutput("OnDisabled", self)
 	self.Enabled = false
 	self:SetNoDraw(true)
 end
 
 function ENT:Input_Enable()
+	self:TriggerOutput("OnReenabled", self)
 	self.Enabled = true
 end
 
 function ENT:Input_Disable()
+	self:TriggerOutput("OnDisabled", self)
 	self.Enabled = false
 end
 -- Inputs End
