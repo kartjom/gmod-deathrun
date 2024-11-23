@@ -55,7 +55,8 @@ function ENT:Touch(ent)
 
     elseif (ent:IsValid()) then
 
-        ent:TakeDamage(self.Damage , self:GetOwner(), self)
+        local attacker = IsValid(self:GetOwner()) and self:GetOwner() or self
+        ent:TakeDamage(self.Damage , attacker, self)
         
         local phy = ent:GetPhysicsObject()
         if (IsValid(phy)) then

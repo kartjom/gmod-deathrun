@@ -52,7 +52,8 @@ function ENT:Explode()
     explode:Spawn()
     explode:Fire("Explode", 0, 0)
 
-    util.BlastDamage(self, self:GetOwner(), self:GetPos(), self.SplashRadius, self.Damage)
+    local attacker = IsValid(self:GetOwner()) and self:GetOwner() or self
+    util.BlastDamage(self, attacker, self:GetPos(), self.SplashRadius, self.Damage)
 
     self:Remove()
 end
