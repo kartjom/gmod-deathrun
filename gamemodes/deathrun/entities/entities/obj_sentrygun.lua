@@ -84,31 +84,7 @@ function ENT:AcceptInput(inputName, activator, caller, data)
     if (string.iequals(inputName, "Disable")) then self:Input_Disable() end
 end
 
-function ENT:Constructor()
-	local iHealth = ternary(self:IsMiniBuilding(), SENTRYGUN_MINI_MAX_HEALTH, SENTRYGUN_MAX_HEALTH)
-	self:SetMaxHealth(iHealth)
-	self:SetHealth(iHealth)
-
-	self.m_flFireRate = 1
-	self.m_flSentryRange = SENTRY_MAX_RANGE
-	self.m_nShieldLevel = SHIELD_NONE
-	self.m_flScaledSentry = 1 -- mini sentry is just scaled down normal sentry with light bodygroup on top
-
-	self.m_vecCurAngles = Vector()
-    self.m_vecGoalAngles = Vector()
-
-    self.m_flTurnRate = 0
-    self.m_bTurningRight = false
-
-    self.m_flNextAttack = 0
-    self.m_flNextRocketAttack = 0
-
-    self.m_iLastMuzzleAttachmentFired = 0
-end
-
 function ENT:Initialize()
-	self:Constructor()
-
 	self.Enabled = true
 
 	self.m_iUpgradeLevel = 0
@@ -133,11 +109,30 @@ function ENT:Initialize()
 	self.m_iMaxAmmoShells = SENTRYGUN_MAX_SHELLS_1
 	self.m_iMaxAmmoRockets = SENTRYGUN_MAX_ROCKETS
 
+	self.m_flFireRate = 1
+	self.m_flSentryRange = SENTRY_MAX_RANGE
+    self.m_flNextAttack = 0
+    self.m_flNextRocketAttack = 0
+    self.m_iLastMuzzleAttachmentFired = 0
+
 	// Start searching for enemies
 	self.m_hEnemy = nil
 
 	self.m_flHeavyBulletResist = SENTRYGUN_MINIGUN_RESIST_LVL_1
+	
+	self.m_nShieldLevel = SHIELD_NONE -- todo: implement
+	self.m_flScaledSentry = 1 -- mini sentry is just scaled down normal sentry with light bodygroup on top, todo: implement
 
+	self.m_vecCurAngles = Vector()
+    self.m_vecGoalAngles = Vector()
+
+    self.m_flTurnRate = 0
+    self.m_bTurningRight = false
+
+	local iHealth = ternary(self:IsMiniBuilding(), SENTRYGUN_MINI_MAX_HEALTH, SENTRYGUN_MAX_HEALTH)
+	self:SetMaxHealth(iHealth)
+	self:SetHealth(iHealth)
+	
 	self:SetSentryModel(SENTRY_MODEL_PLACEMENT)
 
 	local shouldBeSolid = self:GetStoredValue("SolidToPlayer", "bool", true)
