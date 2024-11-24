@@ -227,7 +227,7 @@ function ENT:SentryRotate()
 		else
             if (self.m_iUpgradeLevel == 1) then self:EmitSound("Building_Sentrygun.Idle") end
             if (self.m_iUpgradeLevel == 2) then self:EmitSound("Building_Sentrygun.Idle2") end
-            if (self.m_iUpgradeLevel == 3) then self:EmitSound("Building_Sentrygun.Idle3") end
+            if (self.m_iUpgradeLevel >= 3) then self:EmitSound("Building_Sentrygun.Idle3") end
 
 			// Switch rotation direction
 			if ( self.m_bTurningRight ) then
@@ -319,7 +319,7 @@ end
 function ENT:FoundTarget( pTarget, vecSoundCenter, bNoSound )
 	self.m_hEnemy = pTarget
 
-	if ( ( self.m_iAmmoShells > 0 ) || ( self.m_iAmmoRockets > 0 && self.m_iUpgradeLevel == 3 ) ) then
+	if ( ( self.m_iAmmoShells > 0 ) || ( self.m_iAmmoRockets > 0 && self.m_iUpgradeLevel >= 3 ) ) then
 		// Play one sound to everyone but the target.
 		local filter = RecipientFilter()
         filter:AddPVS(vecSoundCenter)
@@ -477,7 +477,7 @@ function ENT:SentryFire()
 	local vecAimDir = Vector()
 
 	// Level 3 Turrets fire rockets every 3 seconds
-	if ( self.m_iUpgradeLevel == 3 && (self.m_iAmmoRockets > 0 || self:HasInfiniteAmmo()) && self.m_flNextRocketAttack < CurTime() ) then
+	if ( self.m_iUpgradeLevel >= 3 && (self.m_iAmmoRockets > 0 || self:HasInfiniteAmmo()) && self.m_flNextRocketAttack < CurTime() ) then
 		self:FireRocket()
     end
 
@@ -549,7 +549,7 @@ function ENT:SentryFire()
 		else
 			if (self.m_iUpgradeLevel == 1) then self:EmitSound( "Building_Sentrygun.Fire" ) end
 			if (self.m_iUpgradeLevel == 2) then self:EmitSound( "Building_Sentrygun.Fire2" ) end
-			if (self.m_iUpgradeLevel == 3) then self:EmitSound( "Building_Sentrygun.Fire3" ) end
+			if (self.m_iUpgradeLevel >= 3) then self:EmitSound( "Building_Sentrygun.Fire3" ) end
 		end
 
 		if ( !self:HasInfiniteAmmo() ) then
@@ -742,7 +742,7 @@ function ENT:Upgrade()
 		self.m_iMaxAmmoShells = SENTRYGUN_MAX_SHELLS_2
     end
 
-    if (self.m_iUpgradeLevel == 3) then
+    if (self.m_iUpgradeLevel >= 3) then
         self:SetSentryModel(SENTRY_MODEL_LEVEL_3)
 		self.m_flHeavyBulletResist = SENTRYGUN_MINIGUN_RESIST_LVL_3
 		self.m_iMaxAmmoShells = SENTRYGUN_MAX_SHELLS_3
