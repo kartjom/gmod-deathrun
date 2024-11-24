@@ -23,6 +23,12 @@ local SENTRY_MODEL_LEVEL_3_UPGRADE = "models/buildables/sentry3_heavy.mdl"
 
 local SENTRY_ROCKET_MODEL = "models/buildables/sentry3_rockets.mdl"
 
+local BUILDING_DAMAGE_LEVEL_NONE = 0		// 100%
+local BUILDING_DAMAGE_LEVEL_LIGHT = 1		// 75% - 99%
+local BUILDING_DAMAGE_LEVEL_MEDIUM = 2		// 50% - 76%
+local BUILDING_DAMAGE_LEVEL_HEAVY = 3		// 25% - 49%	
+local BUILDING_DAMAGE_LEVEL_CRITICAL = 4	// 0% - 24%
+
 local TF_TEAM_RED = 2
 local TF_TEAM_BLUE = 3
 
@@ -125,6 +131,7 @@ function ENT:Initialize()
 
 	self.m_flHeavyBulletResist = SENTRYGUN_MINIGUN_RESIST_LVL_1
 	
+	self.m_damageLevel = BUILDING_DAMAGE_LEVEL_NONE
 	self.m_nShieldLevel = SHIELD_NONE -- todo: implement
 	self.m_flScaledSentry = 1 -- mini sentry is just scaled down normal sentry with light bodygroup on top, todo: implement
 
@@ -197,6 +204,12 @@ function ENT:Think()
 
     if (self.m_iState == SENTRY_STATE_SEARCHING) then self:SentryRotate() end
     if (self.m_iState == SENTRY_STATE_ATTACKING) then self:Attack() end
+
+	local dmgLevel = self:CalculateDamageLevel()
+	if (dmgLevel != self.m_damageLevel) then
+		self:UpdateDamageEffects(dmgLevel)
+		self.m_damageLevel = dmgLevel
+	end
 
     self:NextThink(CurTime() + SENTRY_THINK_DELAY)
     return true
@@ -823,6 +836,65 @@ function ENT:SetSentryModel(pModel)
 
 	self:SetPoseParameter(self.m_iPitchPoseParameter, flPoseParam0)
 	self:SetPoseParameter(self.m_iYawPoseParameter, flPoseParam1)
+end
+
+function ENT:CalculateDamageLevel()
+	local flPercentHealth = self:Health() / self:GetMaxHealth()
+
+	local damageLevel = BUILDING_DAMAGE_LEVEL_NONE;
+
+	if (flPercentHealth < 0.25 ) then
+		damageLevel = BUILDING_DAMAGE_LEVEL_CRITICAL;
+	elseif (flPercentHealth < 0.45 ) then
+		damageLevel = BUILDING_DAMAGE_LEVEL_HEAVY;
+	elseif ( flPercentHealth < 0.65 ) then
+		damageLevel = BUILDING_DAMAGE_LEVEL_MEDIUM;
+	elseif ( flPercentHealth < 0.85 ) then
+		damageLevel = BUILDING_DAMAGE_LEVEL_LIGHT;
+	end
+
+	return damageLevel
+end
+
+function ENT:UpdateDamageEffects(damageLevel)
+	if ( IsValid(self.m_hDamageSmokeEffect) ) 	then self.m_hDamageSmokeEffect:Remove() end
+	if ( IsValid(self.m_hDamageFireEffect) ) 	then self.m_hDamageFireEffect:Remove() end
+
+	local dmgTable = {
+		[BUILDING_DAMAGE_LEVEL_NONE] = 		{ smoke = nil, fire = nil },
+    	[BUILDING_DAMAGE_LEVEL_LIGHT] = 	{ smoke = "buildingdamage_smoke1", fire = nil },
+    	[BUILDING_DAMAGE_LEVEL_MEDIUM] = 	{ smoke = "buildingdamage_smoke2", fire = "buildingdamage_fire1" },
+    	[BUILDING_DAMAGE_LEVEL_HEAVY] = 	{ smoke = "buildingdamage_smoke3", fire = "buildingdamage_fire2" },
+    	[BUILDING_DAMAGE_LEVEL_CRITICAL] = 	{ smoke = "buildingdamage_smoke4", fire = "buildingdamage_fire3" },
+	}
+
+	local eff = dmgTable[damageLevel]
+	local att_name = ternary(self.m_iUpgradeLevel >= 3, "sentrydamage", "build_point_0")
+	local att_index = self:LookupAttachment(att_name)
+
+	if (att_index <= 0) then return end
+
+	if (eff.smoke != nil) then
+		self.m_hDamageSmokeEffect = ents.Create("info_particle_system")
+		self.m_hDamageSmokeEffect:SetKeyValue("effect_name", eff.smoke)
+		self.m_hDamageSmokeEffect:SetParent(self, att_index)
+		self.m_hDamageSmokeEffect:SetLocalPos(Vector())
+		self.m_hDamageSmokeEffect:SetLocalAngles(Angle())
+		self.m_hDamageSmokeEffect:Spawn()
+		self.m_hDamageSmokeEffect:Activate()
+		self.m_hDamageSmokeEffect:Fire("start", "", 0)
+	end
+
+	if (eff.fire != nil) then
+		self.m_hDamageFireEffect = ents.Create("info_particle_system")
+		self.m_hDamageFireEffect:SetKeyValue("effect_name", eff.fire)
+		self.m_hDamageFireEffect:SetParent(self, att_index)
+		self.m_hDamageFireEffect:SetLocalPos(Vector())
+		self.m_hDamageFireEffect:SetLocalAngles(Angle())
+		self.m_hDamageFireEffect:Spawn()
+		self.m_hDamageFireEffect:Activate()
+		self.m_hDamageFireEffect:Fire("start", "", 0)
+	end
 end
 
 function ENT:SetSentryHealth(value)
