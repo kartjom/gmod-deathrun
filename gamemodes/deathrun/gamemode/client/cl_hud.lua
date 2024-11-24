@@ -1,5 +1,3 @@
-AddCSLuaFile()
-
 hook.Add("HUDPaint", "DEATHRUN.DrawRoundTime", function()
     local text = ""
     local align = TEXT_ALIGN_CENTER

@@ -1,5 +1,3 @@
-AddCSLuaFile()
-
 surface.CreateFont("tf2_font", {
 	font = "TF2 Secondary",
 	extended = false,

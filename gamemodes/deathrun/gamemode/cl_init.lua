@@ -1,4 +1,3 @@
-AddCSLuaFile()
 include("shared.lua")
 
 /* Include Client Files */

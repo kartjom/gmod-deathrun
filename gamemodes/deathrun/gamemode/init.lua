@@ -1,3 +1,7 @@
+/* Send to client */
+AddCSLuaFile("shared.lua")
+AddCSLuaFile("cl_init.lua")
+
 /* Network Strings */
 util.AddNetworkString("DEATHRUN.PlaySound")
 util.AddNetworkString("DEATHRUN.RoundEnd")
@@ -15,6 +19,10 @@ include("server/sv_spectator.lua")
 include("server/sv_entry_point.lua")
 include("server/round_manager/sv_round_manager.lua")
 include("server/round_manager/sv_round_utils.lua")
+
+/* Expose client sided lua and all resources */
+util.IterateDirectory(AddCSLuaFile, "gamemodes/deathrun/gamemode/client", ".lua")
+util.IterateDirectory(resource.AddSingleFile, "gamemodes/deathrun/content")
 
 function GM:PlayerInitialSpawn(ply)
 	ply.InitialSpawn = true

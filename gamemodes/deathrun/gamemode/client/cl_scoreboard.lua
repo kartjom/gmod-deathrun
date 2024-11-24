@@ -1,5 +1,3 @@
-AddCSLuaFile()
-
 hook.Add("Think", "DEATHRUN.ScoreboardControls", function()
     if (IsValid(Scoreboard) && IsValid(Scrollbar) && input.IsMouseDown(MOUSE_RIGHT)) then
         gui.EnableScreenClicker(true)

@@ -1,4 +1,19 @@
 AddCSLuaFile()
+
+function util.IterateDirectory(method, dir, ext)
+    dir = dir .. "/"
+    local File, Directory = file.Find(dir.."*", "GAME")
+
+    for k, v in ipairs(File) do
+        if (ext != nil && !string.EndsWith(v, ext)) then continue end
+		method(dir..v)
+    end
+    
+    for k, v in ipairs(Directory) do
+    	util.IterateDirectory(method, dir..v, ext)
+    end
+end
+
 function util.GetAlivePlayers()
 	local alive = {}
 	for k, p in player.Iterator() do

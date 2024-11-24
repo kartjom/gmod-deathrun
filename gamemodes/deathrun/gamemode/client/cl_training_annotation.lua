@@ -1,5 +1,3 @@
-AddCSLuaFile()
-
 local annotations = {}
 
 net.Receive("DEATHRUN.ShowAnnotation", function()
