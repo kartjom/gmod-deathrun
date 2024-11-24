@@ -4,6 +4,8 @@ DEFINE_BASECLASS("player_default")
 local PLAYER = {}
 
 PLAYER.TeammateNoCollide = true
+PLAYER.CrouchedWalkSpeed = 0.4
+PLAYER.DuckSpeed = 0.4
  
 -- gamemodes/base/player_class/player_default.lua
 function PLAYER:SetupDataTables()
