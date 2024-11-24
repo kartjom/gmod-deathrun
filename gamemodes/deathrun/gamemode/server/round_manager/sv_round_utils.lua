@@ -40,12 +40,19 @@ function DEATHRUN.RoundManager.CheckForRoundEnd()
 end
 
 function DEATHRUN.RoundManager.RandomizeTeams()
-    local Players = player.GetAll()
-    table.Shuffle(Players)
+    local players = player.GetAll()
+    
+    -- no point of creating teams if there's less than 2 players
+    if ( #players < 2 ) then
+        for k,v in ipairs(players) do v:SetRunner() end
+        return
+    end
+
+    table.Shuffle(players)
 
     -- pick random player that hasn't been activator yet
     local activator = nil
-    for k,v in ipairs(Players) do
+    for k,v in ipairs(players) do
         if (!v.WasActivator) then
             activator = v
             break
@@ -53,22 +60,37 @@ function DEATHRUN.RoundManager.RandomizeTeams()
     end
 
     -- reset queue if everyone was activator
-    if (activator == nil) then
-        for k,v in ipairs(Players) do
+    if ( !IsValid(activator) ) then
+        for k,v in ipairs(players) do
             v.WasActivator = false
         end
 
-        activator = Players[1]
+        -- mark whoever played activator last
+        if ( IsValid(DEATHRUN.RoundManager.LastActivator) ) then
+            DEATHRUN.RoundManager.LastActivator.WasActivator = true
+        end
+
+        -- and try selecting activator again
+        for k,v in ipairs(players) do
+            if (!v.WasActivator) then
+                activator = v
+                break
+            end
+        end
     end
 
     -- Activator
-    activator:SetActivator()
-    activator.WasActivator = true
+    if ( IsValid(activator) ) then
+        activator:SetActivator()
+        activator.WasActivator = true
+        
+        table.RemoveByValue(players, activator)
 
-    table.RemoveByValue(Players, activator)
+        DEATHRUN.RoundManager.LastActivator = activator
+    end
 
     -- Runners
-    for k,v in ipairs(Players) do
+    for k,v in ipairs(players) do
         v:SetRunner()
     end
 end
