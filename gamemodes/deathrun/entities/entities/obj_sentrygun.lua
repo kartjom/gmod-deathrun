@@ -846,7 +846,7 @@ function ENT:DetonateObject()
     ParticleEffect("ExplosionCore_MidAir", self:GetPos(), Angle())
 
 	self:PrecacheGibs()
-	self:GibBreakServer(Vector(math.random(-100, 100), math.random(-100, 100), math.random(100, 150)))
+	self:GibBreakClient(Vector(math.random(-50, 50), math.random(-50, 50), math.random(50, 100)))
 
 	self:Remove()
 	

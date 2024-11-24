@@ -74,7 +74,7 @@ function ENT:Touch(ent)
             ParticleEffect("impact_metal", self:GetPos(), Angle(), nil)
         else
             self:PrecacheGibs()
-	        self:GibBreakServer(Vector(math.random(-100, 100), math.random(-100, 100), math.random(100, 150)))
+	        self:GibBreakClient(Vector(math.random(-50, 50), math.random(-50, 50), math.random(50, 100)))
 
             self:Remove()
         end
