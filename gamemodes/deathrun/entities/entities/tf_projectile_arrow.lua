@@ -17,6 +17,7 @@ ENT.Damage = 25
 function ENT:Initialize()
 	self:SetModel("models/weapons/w_models/w_arrow.mdl")
 	self:SetMoveType(MOVETYPE_FLYGRAVITY)
+    self:SetMoveCollide(MOVECOLLIDE_FLY_CUSTOM)
 	self:SetSolid(SOLID_BBOX)
     self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE)
     self:SetTrigger(true)
@@ -24,13 +25,13 @@ function ENT:Initialize()
 	self:DrawShadow(false)
     self:SetGravity(0.7)
 	
-    local size = 0.25
+    local size = 1
 	self:SetCollisionBounds(Vector(-size, -size, -size), Vector(size, size, size))
 
     util.SpriteTrail(self, 0, Color(255,255,255,255), false, 3, 1, 0.3, 1.0/(96.0 * 1.0), "effects/arrowtrail_red.vmt")
 
     self.Stuck = false
-	self.RemoveAfter = CurTime() + 20
+	self.RemoveAfter = CurTime() + 10
 end
 
 function ENT:Think()
@@ -68,8 +69,15 @@ function ENT:Touch(ent)
             phy:ApplyForceCenter(self:GetForward() * physforce)
         end
 
-        ent:EmitSound("Weapon_Arrow.ImpactConcrete")
-        ParticleEffect("impact_metal", self:GetPos(), Angle(), nil)
+        if (ent:IsPlayer() || ent:IsNPC()) then
+            ent:EmitSound("Weapon_Arrow.ImpactConcrete")
+            ParticleEffect("impact_metal", self:GetPos(), Angle(), nil)
+        else
+            self:PrecacheGibs()
+	        self:GibBreakServer(Vector(math.random(-100, 100), math.random(-100, 100), math.random(100, 150)))
+
+            self:Remove()
+        end
 
         -- Should arrow dissapear?
         --self:Remove()
