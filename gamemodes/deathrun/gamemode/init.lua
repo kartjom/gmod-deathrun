@@ -20,9 +20,9 @@ include("server/sv_entry_point.lua")
 include("server/round_manager/sv_round_manager.lua")
 include("server/round_manager/sv_round_utils.lua")
 
-/* Expose client sided lua and all resources */
+/* Expose client sided lua and content */
 util.IterateDirectory(AddCSLuaFile, "gamemodes/deathrun/gamemode/client", ".lua")
-util.IterateDirectory(resource.AddSingleFile, "gamemodes/deathrun/content")
+resource.AddWorkshop("3263744000")
 
 function GM:PlayerInitialSpawn(ply)
 	ply.InitialSpawn = true
