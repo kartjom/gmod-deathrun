@@ -36,6 +36,7 @@ function ply:SpectateNext(currentTarget)
 	if (IsValid(nextTarget)) then
 		self:SpectateEntity(nextTarget)
 		self:SetPos(nextTarget:GetPos() + Vector(0, 0, 64))
+		self:SetupHands(nextTarget)
 	end
 end
 
@@ -49,6 +50,7 @@ function ply:SpectatePrevious(currentTarget)
 	if (IsValid(previousTarget)) then
 		self:SpectateEntity(previousTarget)
 		self:SetPos(previousTarget:GetPos() + Vector(0, 0, 64))
+		self:SetupHands(previousTarget)
 	end
 end
 
