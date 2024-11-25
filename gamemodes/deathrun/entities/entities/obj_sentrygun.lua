@@ -921,8 +921,6 @@ function ENT:DetonateObject()
 	self:GibBreakClient(Vector(math.random(-50, 50), math.random(-50, 50), math.random(50, 100)))
 
 	self:Remove()
-	
-	print("DetonateObject()")
 end
 
 -- Flags
@@ -978,12 +976,18 @@ function ENT:Input_Show()
 	self:TriggerOutput("OnReenabled", self)
 	self.Enabled = true
 	self:SetNoDraw(false)
+
+	if ( IsValid(self.m_hDamageSmokeEffect) ) 	then self.m_hDamageSmokeEffect:Fire("Start") end
+	if ( IsValid(self.m_hDamageFireEffect) ) 	then self.m_hDamageFireEffect:Fire("Start") end
 end
 
 function ENT:Input_Hide()
 	self:TriggerOutput("OnDisabled", self)
 	self.Enabled = false
 	self:SetNoDraw(true)
+
+	if ( IsValid(self.m_hDamageSmokeEffect) ) 	then self.m_hDamageSmokeEffect:Fire("Stop") end
+	if ( IsValid(self.m_hDamageFireEffect) ) 	then self.m_hDamageFireEffect:Fire("Stop") end
 end
 
 function ENT:Input_Enable()
