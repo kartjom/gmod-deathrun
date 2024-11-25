@@ -12,10 +12,7 @@ function ENT:KeyValue(key, value)
 end
 
 function ENT:Initialize()
-    local startDisabled = self:GetStoredValue("startdisabled")
-    if (startDisabled) then
-        self.Enabled = false
-    end
+    self.Enabled = !self:GetStoredValue("startdisabled", "bool", false)
 end
 
 function ENT:StartTouch(entity)
@@ -26,7 +23,7 @@ function ENT:Touch(entity)
     if (!self.Enabled) then return end
     
     if (entity:IsPlayer()) then
-        entity:SetPos(self:GetPos() + self:GetStoredValue("teleportoffset", "Vector"))
+        entity:SetPos(self:GetPos() + self:GetStoredValue("teleportoffset", "Vector", Vector(0, 0, 0)))
     end
 
     self:TriggerOutput("OnTouching")

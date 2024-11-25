@@ -13,6 +13,7 @@ function PLAYER:SetupDataTables()
 end
 
 function PLAYER:SetNetworkedVariables() -- override this
+    self.Player:SetTFClass(0)
 end
 
 function PLAYER:SetTeam() -- override this
@@ -40,6 +41,13 @@ function PLAYER:Spawn()
     self.Player:SetCanZoom(true)
     self.Player:Freeze(false)
     self.Player:SetMoveType(MOVETYPE_WALK)
+end
+
+function PLAYER:Death()
+    self.Player:SetParent(NULL)
+    self.Player:SetGravity(0)
+    self.Player:Extinguish()
+	self.Player:GodDisable()
 end
 
 function PLAYER:SetModel()

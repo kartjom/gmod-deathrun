@@ -12,10 +12,7 @@ function ENT:KeyValue(key, value)
 end
 
 function ENT:Initialize()
-    local startDisabled = self:GetStoredValue("startdisabled")
-    if (startDisabled) then
-        self.Enabled = false
-    end
+    self.Enabled = !self:GetStoredValue("startdisabled", "bool", false)
 end
 
 function ENT:StartTouch(entity)
@@ -25,7 +22,7 @@ end
 function ENT:Touch(entity)
     if (!self.Enabled) then return end
     
-    local duration = self:GetStoredValue("burn_duration", "int") || 1
+    local duration = self:GetStoredValue("burn_duration", "int", 1)
     entity:Ignite(duration)
 
     self:TriggerOutput("OnTouching")
