@@ -16,6 +16,8 @@ function ENT:Initialize()
 end
 
 function ENT:StartTouch(entity)
+    if (!self.Enabled) then return end
+    
     self:TriggerOutput("OnStartTouch")
 end
 
@@ -29,6 +31,8 @@ function ENT:Touch(entity)
 end
 
 function ENT:EndTouch(entity)
+    if (!self.Enabled) then return end
+
     self:TriggerOutput("OnEndTouch")
 end
 
