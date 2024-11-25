@@ -1,4 +1,4 @@
-ENT.Base = "base_entity"
+ENT.Base = "base_point"
 ENT.Type = "point"
 
 ENT.AllowedInputs = {
@@ -25,10 +25,6 @@ function ENT:AcceptInput(inputName, activator, caller, data)
     else
         --PrintMessage(HUD_PRINTTALK, "[DEV] Unhandled input: game_forcerespawn "..inputName..": "..tostring(data))
     end
-end
-
-function ENT:UpdateTransmitState()
-	return TRANSMIT_NEVER
 end
 
 function ENT:ForceTeamRespawn(team)

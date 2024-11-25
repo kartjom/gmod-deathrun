@@ -1,4 +1,4 @@
-ENT.Base = "base_entity"
+ENT.Base = "base_point"
 ENT.Type = "point"
 
 function ENT:KeyValue(key, value)
@@ -10,10 +10,6 @@ end
 -- function ENT:AcceptInput(inputName, activator, caller, data)
 --     PrintMessage(HUD_PRINTTALK, "[DEV] tf_gamerules "..inputName..": "..tostring(data))
 -- end
-
-function ENT:UpdateTransmitState()	
-	return TRANSMIT_NEVER
-end
 
 function tf_gamerules_handleRoundEnd(winnerTeam)
     for k,v in pairs(ents.FindByClass("tf_gamerules")) do

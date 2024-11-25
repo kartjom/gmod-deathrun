@@ -1,9 +1,5 @@
-ENT.Base = "base_entity"
+ENT.Base = "base_point"
 ENT.Type = "point"
-
-function ENT:UpdateTransmitState()	
-	return TRANSMIT_NEVER
-end
 
 function ENT:KeyValue(key, value)
     if (string.StartsWith(key, "On")) then

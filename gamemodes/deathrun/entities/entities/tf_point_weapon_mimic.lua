@@ -1,5 +1,5 @@
 AddCSLuaFile()
-ENT.Base = "base_entity"
+ENT.Base = "base_point"
 ENT.Type = "point"
 
 if (CLIENT) then
@@ -14,10 +14,6 @@ local WEAPON_STANDARD_ARROW = 2
 local WEAPON_STICKY_GRENADE = 3
 
 ENT.StickyBombs = {}
-
-function ENT:UpdateTransmitState()	
-	return TRANSMIT_NEVER
-end
 
 function ENT:KeyValue(key, value)
     if (string.StartsWith(key, "On")) then

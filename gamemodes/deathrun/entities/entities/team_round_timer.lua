@@ -1,4 +1,4 @@
-ENT.Base = "base_entity"
+ENT.Base = "base_point"
 ENT.Type = "point"
 
 function ENT:KeyValue(key, value)
@@ -94,10 +94,6 @@ function ENT:FireOutputIfAvailable(output)
     if (self:CanFireOutput(output)) then
         self:FireOutput(output)
     end
-end
-
-function ENT:UpdateTransmitState()	
-	return TRANSMIT_NEVER
 end
 
 function team_round_timer_OnSetupStart()
