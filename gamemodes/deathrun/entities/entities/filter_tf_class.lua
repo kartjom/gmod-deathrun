@@ -2,18 +2,19 @@ ENT.Base = "base_filter"
 ENT.Type = "filter"
 
 function ENT:KeyValue(key, value)
-	self:StoreValue(key, value)
+    if (string.StartsWith(key, "On")) then
+		self:StoreOutput(key, value)
+	else
+        self:StoreValue(key, value)
+    end
 end
 
--- function ENT:AcceptInput(inputName, activator, caller, data)
---     PrintMessage(HUD_PRINTTALK, "[DEV] filter_tf_class "..inputName..": "..tostring(data))
--- end
-
 function ENT:PassesFilter(trigger, ent)
-	-- TODO: handle 'Negated' key value
+	return ent:IsPlayer() && !ent:IsSpectator() && ent:GetTFClass() == self.tfclass
+end
 
-	local tfclass = self:GetStoredValue("tfclass", "int")
-	return ent:IsPlayer() && !ent:IsSpectator() && ent:GetTFClass() == tfclass
+function ENT:Initialize()
+    self.tfclass = self:GetStoredValue("tfclass", "int", 0)
 end
 
 function ENT:UpdateTransmitState()
