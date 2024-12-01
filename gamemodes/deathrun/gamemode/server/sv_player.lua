@@ -24,6 +24,18 @@ function PlaySound(snd)
     net.Broadcast()
 end
 
+function PlaySoundRunners(snd)
+    net.Start("DEATHRUN.PlaySound")
+        net.WriteString(snd)
+    net.Send( DEATHRUN.RoundManager.GetRunners(true) )
+end
+
+function PlaySoundActivators(snd)
+    net.Start("DEATHRUN.PlaySound")
+        net.WriteString(snd)
+    net.Send( DEATHRUN.RoundManager.GetActivators(true) )
+end
+
 hook.Add("EntityTakeDamage", "DEATHRUN.DamageMultiplier", function(target, dmginfo)
     if (target:IsPlayer() && dmginfo:GetAttacker():IsPlayer() && dmginfo:GetDamageType() == DMG_CLUB) then
         dmginfo:SetDamage(target:GetMaxHealth() / 2)
