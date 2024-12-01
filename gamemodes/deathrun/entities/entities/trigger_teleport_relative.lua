@@ -1,4 +1,4 @@
-ENT.Base = "base_entity"
+ENT.Base = "base_brush"
 ENT.Type = "brush"
 
 ENT.Enabled = true
@@ -16,6 +16,8 @@ function ENT:Initialize()
 end
 
 function ENT:StartTouch(entity)
+    if (!self.Enabled) then return end
+
     self:TriggerOutput("OnStartTouch")
 end
 
@@ -30,6 +32,8 @@ function ENT:Touch(entity)
 end
 
 function ENT:EndTouch(entity)
+    if (!self.Enabled) then return end
+
     self:TriggerOutput("OnEndTouch")
 end
 
@@ -37,8 +41,6 @@ function ENT:AcceptInput(inputName, activator, caller, data)
     if (string.iequals(inputName, "enable")) then self.Enabled = true end
     if (string.iequals(inputName, "disable")) then self.Enabled = false end
     if (string.iequals(inputName, "toggle")) then self.Enabled = !self.Enabled end
-
-    --PrintMessage(HUD_PRINTTALK, "[DEV] trigger_teleport_relative "..inputName..": "..tostring(data))
 end
 
 function ENT:UpdateTransmitState()	

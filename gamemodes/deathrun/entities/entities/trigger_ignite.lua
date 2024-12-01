@@ -1,4 +1,4 @@
-ENT.Base = "base_entity"
+ENT.Base = "base_brush"
 ENT.Type = "brush"
 
 ENT.Enabled = true
@@ -40,8 +40,6 @@ function ENT:AcceptInput(inputName, activator, caller, data)
     if (string.iequals(inputName, "enable")) then self.Enabled = true end
     if (string.iequals(inputName, "disable")) then self.Enabled = false end
     if (string.iequals(inputName, "toggle")) then self.Enabled = !self.Enabled end
-
-    --PrintMessage(HUD_PRINTTALK, "[DEV] trigger_ignite "..inputName..": "..tostring(data))
 end
 
 function ENT:UpdateTransmitState()	
