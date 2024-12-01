@@ -19,11 +19,11 @@ function DEATHRUN.SetupTeams()
     local game_ver = DEATHRUN.GetGameVersion()
 
     if (game_ver == DEATHRUN.GAME.TF2) then
-        SetGlobal2Int("DEATHRUN.Team.Runner", 2)
-        SetGlobal2Int("DEATHRUN.Team.Activator", 3)
+        SetGlobal2Int("DEATHRUN.Team.Runner", 2) -- RED
+        SetGlobal2Int("DEATHRUN.Team.Activator", 3) -- BLU
     elseif (game_ver == DEATHRUN.GAME.CSS || game_ver == DEATHRUN.GAME.OTHER) then
-        SetGlobal2Int("DEATHRUN.Team.Runner", 3)
-        SetGlobal2Int("DEATHRUN.Team.Activator", 2)
+        SetGlobal2Int("DEATHRUN.Team.Runner", 3) -- CT
+        SetGlobal2Int("DEATHRUN.Team.Activator", 2) -- T
     end
 
     team.SetUp(DEATHRUN.TeamRunner(), "Runners", Color(0, 100, 255))
